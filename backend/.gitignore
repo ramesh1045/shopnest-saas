@@ -1,0 +1,32 @@
+# Node
+node_modules/
+dist/
+build/
+*.log
+npm-debug.log*
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Uploads
+uploads/
+backend/uploads/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Angular
+frontend/dist/
+frontend/.angular/
+
+# Temp
+*.tmp
+tmp/
