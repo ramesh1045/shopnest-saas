@@ -1,0 +1,52 @@
+<aside class="merchant-sidebar">
+  <!-- Brand -->
+  <div class="sidebar-brand">
+    <span class="brand-mark">SN</span>
+    <span class="brand-text">ShopNest</span>
+  </div>
+
+  <!-- Store Card -->
+  <div class="store-card" *ngIf="store()">
+    <div class="store-avatar">{{ storeInitial() }}</div>
+    <div class="store-info">
+      <div class="store-name">{{ store()!.name }}</div>
+      <div class="store-role">Merchant</div>
+    </div>
+  </div>
+
+  <!-- Navigation -->
+  <nav class="sidebar-nav">
+    <a
+      *ngFor="let item of navItems"
+      [routerLink]="item.path"
+      routerLinkActive="active"
+      [routerLinkActiveOptions]="{ exact: item.exact }"
+      class="nav-item"
+    >
+      <i class="bi" [ngClass]="item.icon"></i>
+      <span>{{ item.label }}</span>
+    </a>
+  </nav>
+
+  <!-- Bottom actions -->
+  <div class="sidebar-footer">
+    <a
+      [routerLink]="['/store', storeSlug()]"
+      target="_blank"
+      class="nav-item view-store"
+    >
+      <i class="bi bi-box-arrow-up-right"></i>
+      <span>View Store</span>
+    </a>
+
+    <div class="user-card">
+      <div class="user-avatar">
+        <i class="bi bi-person-circle"></i>
+      </div>
+      <div class="user-info">
+        <div class="user-name">{{ user()?.fullName || 'User' }}</div>
+        <div class="user-role">{{ user()?.role }}</div>
+      </div>
+    </div>
+  </div>
+</aside>

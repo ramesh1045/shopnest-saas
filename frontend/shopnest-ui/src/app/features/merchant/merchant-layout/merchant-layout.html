@@ -1,0 +1,68 @@
+<div class="merchant-shell">
+  <!-- Sidebar -->
+  <app-merchant-sidebar></app-merchant-sidebar>
+
+  <!-- Main area -->
+  <div class="merchant-main">
+    <!-- Top bar -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <h2 class="topbar-title">Merchant Dashboard</h2>
+        <p class="topbar-sub" *ngIf="store()">
+          Managing <strong>{{ store()!.name }}</strong>
+        </p>
+      </div>
+
+      <div class="topbar-right">
+        <button type="button" class="icon-btn" title="Notifications">
+          <i class="bi bi-bell"></i>
+        </button>
+
+        <div class="user-menu">
+          <button type="button" class="user-btn" (click)="toggleUserMenu()">
+            <i class="bi bi-person-circle"></i>
+            <span class="d-none d-md-inline ms-1">
+              {{ user()?.fullName?.split(' ')?.[0] || 'User' }}
+            </span>
+            <i class="bi bi-chevron-down ms-1 small"></i>
+          </button>
+
+          <div class="user-dropdown" *ngIf="userMenuOpen()">
+            <div class="dropdown-header">
+              <div class="dropdown-name">{{ user()?.fullName }}</div>
+              <div class="dropdown-email">{{ user()?.email }}</div>
+            </div>
+            <div class="dropdown-divider"></div>
+            <a
+              [routerLink]="['/store', store()?.slug]"
+              target="_blank"
+              class="dropdown-item"
+            >
+              <i class="bi bi-box-arrow-up-right"></i> View Store
+            </a>
+            <a routerLink="/merchant/settings" class="dropdown-item">
+              <i class="bi bi-gear"></i> Settings
+            </a>
+            <div class="dropdown-divider"></div>
+            <button
+              type="button"
+              class="dropdown-item danger"
+              (click)="logout()"
+            >
+              <i class="bi bi-box-arrow-right"></i> Logout
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="merchant-content">
+      <div *ngIf="loading()" class="loading-page">
+        <div class="spinner-border text-primary"></div>
+        <p class="mt-3 text-muted">Loading dashboard...</p>
+      </div>
+
+      <router-outlet *ngIf="!loading()"></router-outlet>
+    </main>
+  </div>
+</div>

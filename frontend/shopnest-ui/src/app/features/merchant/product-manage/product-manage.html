@@ -1,0 +1,233 @@
+<div class="page">
+  <!-- Header -->
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Products</h1>
+      <p class="page-sub" *ngIf="!loading()">
+        {{ total() }} {{ total() === 1 ? 'product' : 'products' }} in your store
+      </p>
+    </div>
+    <a routerLink="/merchant/products/new" class="btn btn-primary">
+      <i class="bi bi-plus-lg me-1"></i> Add Product
+    </a>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters-bar">
+    <div class="filter-search">
+      <i class="bi bi-search"></i>
+      <input
+        type="text"
+        placeholder="Search by name or SKU..."
+        [ngModel]="searchTerm()"
+        (ngModelChange)="onSearchChange($event)"
+      />
+    </div>
+
+    <select
+      class="filter-select"
+      [ngModel]="selectedCategory()"
+      (ngModelChange)="selectedCategory.set($event); onCategoryChange()"
+    >
+      <option [ngValue]="null">All Categories</option>
+      <option *ngFor="let c of categories()" [ngValue]="c.id">
+        {{ c.name }}
+      </option>
+    </select>
+
+    <select
+      class="filter-select"
+      [ngModel]="statusFilter()"
+      (ngModelChange)="statusFilter.set($event); onStatusChange()"
+    >
+      <option value="all">All Status</option>
+      <option value="active">Active Only</option>
+      <option value="inactive">Inactive Only</option>
+    </select>
+
+    <button
+      type="button"
+      class="btn-clear"
+      *ngIf="hasFilters()"
+      (click)="clearFilters()"
+    >
+      <i class="bi bi-x-circle"></i> Clear
+    </button>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading()" class="loading-block">
+    <div class="spinner-border text-primary"></div>
+  </div>
+
+  <!-- Empty -->
+  <div *ngIf="!loading() && products().length === 0" class="empty-block">
+    <i class="bi bi-box-seam"></i>
+    <h3>No products found</h3>
+    <p *ngIf="!hasFilters()">
+      Get started by adding your first product.
+    </p>
+    <p *ngIf="hasFilters()">
+      Try adjusting your filters.
+    </p>
+    <a
+      *ngIf="!hasFilters()"
+      routerLink="/merchant/products/new"
+      class="btn btn-primary mt-2"
+    >
+      <i class="bi bi-plus-lg me-1"></i> Add First Product
+    </a>
+    <button
+      *ngIf="hasFilters()"
+      class="btn btn-outline-primary mt-2"
+      (click)="clearFilters()"
+    >
+      Clear Filters
+    </button>
+  </div>
+
+  <!-- Table -->
+  <div *ngIf="!loading() && products().length > 0" class="table-wrap">
+    <table class="product-table">
+      <thead>
+        <tr>
+          <th style="width: 60px">Image</th>
+          <th>Product</th>
+          <th>SKU</th>
+          <th class="text-end">Price</th>
+          <th class="text-center">Stock</th>
+          <th class="text-center">Status</th>
+          <th class="text-end">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let p of products()">
+          <!-- Image -->
+          <td>
+            <div class="thumb">
+              <img
+                *ngIf="p.image_url; else noImg"
+                [src]="p.image_url"
+                [alt]="p.name"
+              />
+              <ng-template #noImg>
+                <i class="bi bi-image"></i>
+              </ng-template>
+            </div>
+          </td>
+
+          <!-- Product info -->
+          <td>
+            <div class="product-name">{{ p.name }}</div>
+            <div class="product-cat" *ngIf="p.category_name">
+              <i class="bi bi-tag"></i> {{ p.category_name }}
+            </div>
+          </td>
+
+          <!-- SKU -->
+          <td>
+            <span class="sku" *ngIf="p.sku; else noSku">{{ p.sku }}</span>
+            <ng-template #noSku>
+              <span class="text-muted small">—</span>
+            </ng-template>
+          </td>
+
+          <!-- Price -->
+          <td class="text-end">
+            <div class="price">{{ p.price_inr | inr }}</div>
+            <div
+              class="price-old"
+              *ngIf="p.compare_price_inr && p.compare_price_inr > p.price_inr"
+            >
+              {{ p.compare_price_inr | inr }}
+            </div>
+          </td>
+
+          <!-- Stock -->
+          <td class="text-center">
+            <span
+              class="stock-pill"
+              [class.stock-low]="p.stock_quantity <= 5 && p.stock_quantity > 0"
+              [class.stock-out]="p.stock_quantity === 0"
+              [class.stock-ok]="p.stock_quantity > 5"
+            >
+              {{ p.stock_quantity }}
+            </span>
+          </td>
+
+          <!-- Status -->
+          <td class="text-center">
+            <button
+              type="button"
+              class="status-toggle"
+              [class.active]="p.is_active"
+              (click)="toggleActive(p)"
+              title="Click to toggle"
+            >
+              <i class="bi bi-circle-fill"></i>
+              {{ p.is_active ? 'Active' : 'Inactive' }}
+            </button>
+          </td>
+
+          <!-- Actions -->
+          <td class="text-end">
+            <div class="action-btns">
+              <a
+                [routerLink]="['/merchant/products', p.id, 'edit']"
+                class="btn-icon"
+                title="Edit"
+              >
+                <i class="bi bi-pencil"></i>
+              </a>
+              <button
+                type="button"
+                class="btn-icon btn-danger-icon"
+                title="Delete"
+                (click)="deleteProduct(p)"
+              >
+                <i class="bi bi-trash"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  <div
+    *ngIf="!loading() && totalPages() > 1"
+    class="pagination-wrap"
+  >
+    <button
+      type="button"
+      class="page-btn"
+      [disabled]="currentPage() === 1"
+      (click)="goToPage(currentPage() - 1)"
+    >
+      <i class="bi bi-chevron-left"></i>
+    </button>
+
+    <ng-container *ngFor="let page of getPages()">
+      <span *ngIf="page < 0" class="page-ellipsis">...</span>
+      <button
+        *ngIf="page > 0"
+        type="button"
+        class="page-btn"
+        [class.active]="page === currentPage()"
+        (click)="goToPage(page)"
+      >
+        {{ page }}
+      </button>
+    </ng-container>
+
+    <button
+      type="button"
+      class="page-btn"
+      [disabled]="currentPage() === totalPages()"
+      (click)="goToPage(currentPage() + 1)"
+    >
+      <i class="bi bi-chevron-right"></i>
+    </button>
+  </div>
+</div>

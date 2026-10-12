@@ -1,0 +1,200 @@
+<div class="dashboard">
+  <!-- Loading -->
+  <div *ngIf="loading()" class="loading-block">
+    <div class="spinner-border text-primary"></div>
+    <p class="mt-3 text-muted">Loading dashboard...</p>
+  </div>
+
+  <!-- Content -->
+  <ng-container *ngIf="!loading()">
+    <!-- Welcome -->
+    <div class="welcome-row">
+      <div>
+        <h1 class="welcome-title">Welcome back 👋</h1>
+        <p class="welcome-sub">
+          Here's what's happening with <strong>{{ store()?.name }}</strong> today.
+        </p>
+      </div>
+      <a routerLink="/merchant/products" class="btn btn-primary">
+        <i class="bi bi-plus-lg me-1"></i> Add Product
+      </a>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon bg-orange">
+          <i class="bi bi-currency-rupee"></i>
+        </div>
+        <div class="stat-body">
+          <div class="stat-label">Total Revenue</div>
+          <div class="stat-value">{{ stats().totalRevenue | inr }}</div>
+          <div class="stat-note">From all orders</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon bg-blue">
+          <i class="bi bi-receipt"></i>
+        </div>
+        <div class="stat-body">
+          <div class="stat-label">Total Orders</div>
+          <div class="stat-value">{{ stats().totalOrders }}</div>
+          <div class="stat-note">
+            <span class="text-warning fw-semibold">
+              {{ stats().pendingOrders }} pending
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon bg-green">
+          <i class="bi bi-box-seam"></i>
+        </div>
+        <div class="stat-body">
+          <div class="stat-label">Products</div>
+          <div class="stat-value">{{ stats().totalProducts }}</div>
+          <div class="stat-note">
+            <span
+              class="fw-semibold"
+              [class.text-danger]="stats().lowStockProducts > 0"
+              [class.text-muted]="stats().lowStockProducts === 0"
+            >
+              {{ stats().lowStockProducts }} low stock
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon bg-purple">
+          <i class="bi bi-people"></i>
+        </div>
+        <div class="stat-body">
+          <div class="stat-label">Customers</div>
+          <div class="stat-value">{{ stats().totalCustomers }}</div>
+          <div class="stat-note">Registered buyers</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Two-column -->
+    <div class="content-grid">
+      <!-- Recent Orders -->
+      <div class="panel">
+        <div class="panel-head">
+          <h2 class="panel-title">Recent Orders</h2>
+          <a routerLink="/merchant/orders" class="panel-link">
+            View all <i class="bi bi-arrow-right"></i>
+          </a>
+        </div>
+
+        <div *ngIf="recentOrders().length === 0" class="empty-mini">
+          <i class="bi bi-receipt"></i>
+          <p>No orders yet</p>
+          <span>Orders will appear here once customers start buying.</span>
+        </div>
+
+        <div *ngIf="recentOrders().length > 0" class="orders-mini">
+          <a
+            *ngFor="let order of recentOrders()"
+            [routerLink]="['/merchant/orders', order.id]"
+            class="order-mini-row"
+          >
+            <div class="order-info">
+              <div class="order-num">{{ order.order_number }}</div>
+              <div class="order-customer">
+                {{ order.customer_name || 'Customer' }}
+              </div>
+            </div>
+            <div class="order-right">
+              <div class="order-total">{{ order.total_inr | inr }}</div>
+              <span class="badge" [ngClass]="getStatusClass(order.status)">
+                {{ order.status }}
+              </span>
+            </div>
+          </a>
+        </div>
+      </div>
+
+      <!-- Low Stock -->
+      <div class="panel">
+        <div class="panel-head">
+          <h2 class="panel-title">Low Stock Alert</h2>
+          <a routerLink="/merchant/products" class="panel-link">
+            Manage <i class="bi bi-arrow-right"></i>
+          </a>
+        </div>
+
+        <div *ngIf="lowStockItems().length === 0" class="empty-mini">
+          <i class="bi bi-check-circle"></i>
+          <p>All products well-stocked</p>
+          <span>No items below 5 units.</span>
+        </div>
+
+        <div *ngIf="lowStockItems().length > 0" class="stock-mini">
+          <div *ngFor="let p of lowStockItems()" class="stock-row">
+            <div class="stock-info">
+              <div class="stock-name">{{ p.name }}</div>
+              <div class="stock-sku" *ngIf="p.sku">SKU: {{ p.sku }}</div>
+            </div>
+            <span class="stock-badge">{{ p.stock_quantity }} left</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="panel">
+      <div class="panel-head">
+        <h2 class="panel-title">Quick Actions</h2>
+      </div>
+      <div class="actions-grid">
+        <a routerLink="/merchant/products" class="action-card">
+          <div class="action-icon bg-orange">
+            <i class="bi bi-box-seam"></i>
+          </div>
+          <div>
+            <div class="action-title">Manage Products</div>
+            <div class="action-sub">Add, edit, track stock</div>
+          </div>
+          <i class="bi bi-arrow-right action-arrow"></i>
+        </a>
+
+        <a routerLink="/merchant/orders" class="action-card">
+          <div class="action-icon bg-blue">
+            <i class="bi bi-receipt"></i>
+          </div>
+          <div>
+            <div class="action-title">View Orders</div>
+            <div class="action-sub">Process and fulfill</div>
+          </div>
+          <i class="bi bi-arrow-right action-arrow"></i>
+        </a>
+
+        <a routerLink="/merchant/customers" class="action-card">
+          <div class="action-icon bg-green">
+            <i class="bi bi-people"></i>
+          </div>
+          <div>
+            <div class="action-title">Customers</div>
+            <div class="action-sub">See who's buying</div>
+          </div>
+          <i class="bi bi-arrow-right action-arrow"></i>
+        </a>
+
+        <a routerLink="/merchant/settings" class="action-card">
+          <div class="action-icon bg-purple">
+            <i class="bi bi-gear"></i>
+          </div>
+          <div>
+            <div class="action-title">Store Settings</div>
+            <div class="action-sub">Branding, info</div>
+          </div>
+          <i class="bi bi-arrow-right action-arrow"></i>
+        </a>
+      </div>
+    </div>
+  </ng-container>
+</div>

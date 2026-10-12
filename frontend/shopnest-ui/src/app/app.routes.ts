@@ -19,6 +19,8 @@ export const routes: Routes = [
     component: RegisterComponent,
     title: 'Create Account - ShopNest',
   },
+
+  // ============ STOREFRONT ============
   {
     path: 'store/:slug',
     loadComponent: () =>
@@ -67,6 +69,89 @@ export const routes: Routes = [
       ),
     title: 'Order Confirmed - ShopNest',
   },
+
+  // ============ MERCHANT ============
+  {
+    path: 'merchant',
+    loadComponent: () =>
+      import('./features/merchant/merchant-layout/merchant-layout').then(
+        (m) => m.MerchantLayoutComponent
+      ),
+    children: [
+      {
+        path: '',
+        loadComponent: () =>
+          import('./features/merchant/dashboard/dashboard').then(
+            (m) => m.Dashboard
+          ),
+        title: 'Dashboard - ShopNest',
+      },      {
+        path: 'products',
+        loadComponent: () =>
+          import('./features/merchant/product-manage/product-manage').then(
+            (m) => m.ProductManage
+          ),
+        title: 'Products - ShopNest',
+      },
+      {
+        path: 'products/new',
+        loadComponent: () =>
+          import('./features/merchant/product-form/product-form').then(
+            (m) => m.ProductFormComponent
+          ),
+        title: 'Add Product - ShopNest',
+      },
+      {
+        path: 'products/:id/edit',
+        loadComponent: () =>
+          import('./features/merchant/product-form/product-form').then(
+            (m) => m.ProductFormComponent
+          ),
+        title: 'Edit Product - ShopNest',
+      },
+      {
+        path: 'products',
+        loadComponent: () =>
+          import('./features/merchant/product-manage/product-manage').then(
+            (m) => m.ProductManage
+          ),
+        title: 'Products - ShopNest',
+      },
+      {
+        path: 'orders',
+        loadComponent: () =>
+          import('./features/merchant/order-manage/order-manage').then(
+            (m) => m.OrderManage
+          ),
+        title: 'Orders - ShopNest',
+      },
+      {
+        path: 'orders/:id',
+        loadComponent: () =>
+          import('./features/merchant/order-detail/order-detail').then(
+            (m) => m.OrderDetail
+          ),
+        title: 'Order Details - ShopNest',
+      },
+      {
+        path: 'customers',
+        loadComponent: () =>
+          import('./features/merchant/customer-manage/customer-manage').then(
+            (m) => m.CustomerManage
+          ),
+        title: 'Customers - ShopNest',
+      },
+      {
+        path: 'settings',
+        loadComponent: () =>
+          import('./features/merchant/settings/settings').then(
+            (m) => m.Settings
+          ),
+        title: 'Settings - ShopNest',
+      },
+    ],
+  },
+
   {
     path: '**',
     redirectTo: '',
