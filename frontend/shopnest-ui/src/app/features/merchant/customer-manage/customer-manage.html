@@ -1,1 +1,201 @@
-<p>customer-manage works!</p>
+<div class="page">
+  <!-- Header -->
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Customers</h1>
+      <p class="page-sub" *ngIf="!loading()">
+        {{ total() }} {{ total() === 1 ? 'customer' : 'customers' }} in your store
+      </p>
+    </div>
+  </div>
+
+  <!-- Stats strip -->
+  <div *ngIf="!loading() && customers().length > 0" class="stats-strip">
+    <div class="stat-tile">
+      <div class="stat-icon bg-blue">
+        <i class="bi bi-people-fill"></i>
+      </div>
+      <div>
+        <div class="stat-label">Total Customers</div>
+        <div class="stat-value">{{ total() }}</div>
+      </div>
+    </div>
+
+    <div class="stat-tile">
+      <div class="stat-icon bg-orange">
+        <i class="bi bi-currency-rupee"></i>
+      </div>
+      <div>
+        <div class="stat-label">Revenue (page)</div>
+        <div class="stat-value">{{ totalSpent() | inr }}</div>
+      </div>
+    </div>
+
+    <div class="stat-tile" *ngIf="topCustomer()">
+      <div class="stat-icon bg-green">
+        <i class="bi bi-trophy-fill"></i>
+      </div>
+      <div>
+        <div class="stat-label">Top Customer</div>
+        <div class="stat-value small">
+          {{ topCustomer()!.full_name }}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters-bar">
+    <div class="filter-search">
+      <i class="bi bi-search"></i>
+      <input
+        type="text"
+        placeholder="Search by name, email or phone..."
+        [ngModel]="searchTerm()"
+        (ngModelChange)="onSearchChange($event)"
+      />
+      <button
+        type="button"
+        class="btn-clear-input"
+        *ngIf="searchTerm()"
+        (click)="clearSearch()"
+      >
+        <i class="bi bi-x"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading()" class="loading-block">
+    <div class="spinner-border text-primary"></div>
+  </div>
+
+  <!-- Empty -->
+  <div *ngIf="!loading() && customers().length === 0" class="empty-block">
+    <i class="bi bi-people"></i>
+    <h3>No customers found</h3>
+    <p *ngIf="!searchTerm()">
+      Customers will appear here once they place their first order.
+    </p>
+    <p *ngIf="searchTerm()">
+      No customers match "{{ searchTerm() }}". Try different keywords.
+    </p>
+    <button
+      *ngIf="searchTerm()"
+      class="btn btn-outline-primary mt-2"
+      (click)="clearSearch()"
+    >
+      Clear Search
+    </button>
+  </div>
+
+  <!-- Table -->
+  <div *ngIf="!loading() && customers().length > 0" class="table-wrap">
+    <table class="customer-table">
+      <thead>
+        <tr>
+          <th>Customer</th>
+          <th>Contact</th>
+          <th class="text-center">Orders</th>
+          <th class="text-end">Total Spent</th>
+          <th>Joined</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let c of customers()">
+          <!-- Customer with avatar -->
+          <td>
+            <div class="customer-cell">
+              <div
+                class="avatar"
+                [style.background]="getAvatarColor(c.full_name)"
+              >
+                {{ getInitials(c.full_name) }}
+              </div>
+              <div class="customer-info">
+                <div class="customer-name">{{ c.full_name }}</div>
+                <div class="customer-id">ID #{{ c.id }}</div>
+              </div>
+            </div>
+          </td>
+
+          <!-- Contact -->
+          <td>
+            <div class="contact-line" *ngIf="c.email">
+              <i class="bi bi-envelope"></i>
+              <span class="text-truncate">{{ c.email }}</span>
+            </div>
+            <div class="contact-line" *ngIf="c.phone">
+              <i class="bi bi-telephone"></i>
+              <span>{{ c.phone }}</span>
+            </div>
+            <div class="text-muted small" *ngIf="!c.email && !c.phone">
+              — No contact
+            </div>
+          </td>
+
+          <!-- Orders count -->
+          <td class="text-center">
+            <span
+              class="orders-count"
+              [class.highlight]="c.total_orders > 0"
+            >
+              {{ c.total_orders || 0 }}
+            </span>
+          </td>
+
+          <!-- Total spent -->
+          <td class="text-end">
+            <span
+              class="spent-value"
+              [class.has-spent]="c.total_spent_inr > 0"
+            >
+              {{ c.total_spent_inr | inr }}
+            </span>
+          </td>
+
+          <!-- Joined date -->
+          <td>
+            <div class="joined-date">
+              {{ c.created_at | date: 'mediumDate' }}
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  <div *ngIf="!loading() && totalPages() > 1" class="pagination-wrap">
+    <button
+      type="button"
+      class="page-btn"
+      [disabled]="currentPage() === 1"
+      (click)="goToPage(currentPage() - 1)"
+    >
+      <i class="bi bi-chevron-left"></i>
+    </button>
+
+    <ng-container *ngFor="let page of getPages()">
+      <span *ngIf="page < 0" class="page-ellipsis">...</span>
+      <button
+        *ngIf="page > 0"
+        type="button"
+        class="page-btn"
+        [class.active]="page === currentPage()"
+        (click)="goToPage(page)"
+      >
+        {{ page }}
+      </button>
+    </ng-container>
+
+    <button
+      type="button"
+      class="page-btn"
+      [disabled]="currentPage() === totalPages()"
+      (click)="goToPage(currentPage() + 1)"
+    >
+      <i class="bi bi-chevron-right"></i>
+    </button>
+  </div>
+</div>

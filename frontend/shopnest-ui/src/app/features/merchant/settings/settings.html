@@ -1,1 +1,270 @@
-<p>settings works!</p>
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Settings</h1>
+      <p class="page-sub">Manage your store profile, branding and subscription</p>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading()" class="loading-block">
+    <div class="spinner-border text-primary"></div>
+  </div>
+
+  <!-- Content -->
+  <ng-container *ngIf="!loading()">
+    <!-- Tabs -->
+    <div class="tabs">
+      <button
+        type="button"
+        class="tab"
+        [class.active]="activeTab() === 'profile'"
+        (click)="switchTab('profile')"
+      >
+        <i class="bi bi-shop"></i> Store Profile
+      </button>
+      <button
+        type="button"
+        class="tab"
+        [class.active]="activeTab() === 'branding'"
+        (click)="switchTab('branding')"
+      >
+        <i class="bi bi-palette"></i> Branding
+      </button>
+      <button
+        type="button"
+        class="tab"
+        [class.active]="activeTab() === 'plan'"
+        (click)="switchTab('plan')"
+      >
+        <i class="bi bi-credit-card"></i> Subscription
+      </button>
+    </div>
+
+    <!-- Tab: Profile -->
+    <div *ngIf="activeTab() === 'profile'" class="tab-panel">
+      <form [formGroup]="profileForm" (ngSubmit)="saveProfile()" novalidate>
+        <div class="form-card">
+          <h2 class="card-title">Store Information</h2>
+
+          <div class="field">
+            <label class="form-label" for="name">Store Name *</label>
+            <input
+              id="name"
+              type="text"
+              class="form-control"
+              [class.is-invalid]="name.invalid && name.touched"
+              formControlName="name"
+              placeholder="e.g., Sri Fashion"
+            />
+            <div class="invalid-feedback" *ngIf="name.invalid && name.touched">
+              Store name is required (min 2 characters)
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="form-label">Store URL</label>
+            <div class="url-box">
+              <span class="url-prefix">/store/</span>
+              <span class="url-slug">{{ store()?.slug }}</span>
+              <button
+                type="button"
+                class="btn-copy"
+                (click)="copyStoreUrl()"
+                title="Copy full URL"
+              >
+                <i class="bi bi-clipboard"></i>
+              </button>
+            </div>
+            <div class="field-hint">
+              Customers visit your store at this URL.
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="form-label" for="description">Description</label>
+            <textarea
+              id="description"
+              class="form-control"
+              formControlName="description"
+              rows="3"
+              placeholder="Tell customers what your store is about..."
+            ></textarea>
+          </div>
+
+          <div class="field">
+            <label class="form-label">Theme Color</label>
+            <div class="color-row">
+              <input
+                type="color"
+                class="color-picker"
+                formControlName="theme_color"
+              />
+              <input
+                type="text"
+                class="form-control color-input"
+                formControlName="theme_color"
+                placeholder="#FF6B00"
+              />
+            </div>
+            <div class="field-hint">
+              Accent color for buttons and highlights on your storefront.
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button
+              type="submit"
+              class="btn btn-primary"
+              [disabled]="saving()"
+            >
+              <span
+                *ngIf="saving()"
+                class="spinner-border spinner-border-sm me-2"
+              ></span>
+              {{ saving() ? 'Saving...' : 'Save Changes' }}
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <!-- Tab: Branding -->
+    <div *ngIf="activeTab() === 'branding'" class="tab-panel">
+      <form [formGroup]="brandingForm" (ngSubmit)="saveBranding()" novalidate>
+        <div class="form-card">
+          <h2 class="card-title">Logo & Banner</h2>
+
+          <div class="branding-grid">
+            <div class="branding-col">
+              <label class="form-label">Store Logo</label>
+              <div class="image-preview square">
+                <img
+                  *ngIf="brandingForm.value.logo_url; else noLogo"
+                  [src]="brandingForm.value.logo_url"
+                  alt="Logo preview"
+                />
+                <ng-template #noLogo>
+                  <div class="placeholder">
+                    <i class="bi bi-image"></i>
+                    <span>No logo</span>
+                  </div>
+                </ng-template>
+              </div>
+              <input
+                type="url"
+                class="form-control mt-3"
+                formControlName="logo_url"
+                placeholder="https://example.com/logo.png"
+              />
+              <div class="field-hint">
+                Square image recommended (200x200 or larger).
+              </div>
+            </div>
+
+            <div class="branding-col">
+              <label class="form-label">Store Banner</label>
+              <div class="image-preview wide">
+                <img
+                  *ngIf="brandingForm.value.banner_url; else noBanner"
+                  [src]="brandingForm.value.banner_url"
+                  alt="Banner preview"
+                />
+                <ng-template #noBanner>
+                  <div class="placeholder">
+                    <i class="bi bi-image"></i>
+                    <span>No banner</span>
+                  </div>
+                </ng-template>
+              </div>
+              <input
+                type="url"
+                class="form-control mt-3"
+                formControlName="banner_url"
+                placeholder="https://example.com/banner.jpg"
+              />
+              <div class="field-hint">
+                Wide image recommended (1200x400 or larger).
+              </div>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button
+              type="submit"
+              class="btn btn-primary"
+              [disabled]="saving()"
+            >
+              <span
+                *ngIf="saving()"
+                class="spinner-border spinner-border-sm me-2"
+              ></span>
+              {{ saving() ? 'Saving...' : 'Save Branding' }}
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <!-- Tab: Subscription -->
+    <div *ngIf="activeTab() === 'plan'" class="tab-panel">
+      <div class="form-card" *ngIf="subscription() as sub">
+        <div class="plan-header">
+          <div>
+            <span class="plan-badge">{{ sub.plan_code }}</span>
+            <h2 class="plan-name">{{ sub.plan_name }}</h2>
+          </div>
+          <div class="plan-price">
+            <span class="amount">{{ sub.price_inr | inr }}</span>
+            <span class="period">/month</span>
+          </div>
+        </div>
+
+        <div class="plan-divider"></div>
+
+        <div class="plan-stats">
+          <div class="plan-stat">
+            <div class="stat-label">Products</div>
+            <div class="stat-value">{{ sub.max_products }}</div>
+          </div>
+          <div class="plan-stat">
+            <div class="stat-label">Staff</div>
+            <div class="stat-value">{{ sub.max_staff }}</div>
+          </div>
+          <div class="plan-stat">
+            <div class="stat-label">Days Remaining</div>
+            <div class="stat-value">{{ getDaysRemaining() }}</div>
+          </div>
+        </div>
+
+        <div class="plan-divider"></div>
+
+        <div class="plan-info">
+          <div class="info-row">
+            <span>Started</span>
+            <strong>{{ sub.started_at | date: 'mediumDate' }}</strong>
+          </div>
+          <div class="info-row">
+            <span>Renews on</span>
+            <strong>{{ sub.current_period_end | date: 'mediumDate' }}</strong>
+          </div>
+          <div class="info-row">
+            <span>Status</span>
+            <span class="status-pill">{{ sub.status }}</span>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn btn-primary" disabled>
+            <i class="bi bi-arrow-up-circle me-1"></i> Upgrade Plan (Coming Soon)
+          </button>
+        </div>
+
+        <div class="plan-note">
+          <i class="bi bi-info-circle"></i>
+          To upgrade, downgrade or cancel your plan, contact support.
+        </div>
+      </div>
+    </div>
+  </ng-container>
+</div>
