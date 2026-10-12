@@ -1,0 +1,117 @@
+<header class="store-header">
+  <!-- Top bar -->
+  <div class="top-bar">
+    <div class="container top-bar-inner">
+      <div class="top-bar-left">
+        <i class="bi bi-truck"></i>
+        <span>Free delivery across India</span>
+      </div>
+      <div class="top-bar-right">
+        <i class="bi bi-telephone"></i>
+        <span>Support: +91 98765 43210</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main header -->
+  <div class="main-header">
+    <div class="container main-header-inner">
+      <!-- Logo -->
+      <a [routerLink]="['/store', store?.slug]" class="store-brand">
+        <span class="logo-mark">SN</span>
+        <span class="store-name">{{ store?.name || 'Store' }}</span>
+      </a>
+
+      <!-- Search (desktop) -->
+      <div class="search-box d-none d-md-flex">
+        <i class="bi bi-search"></i>
+        <input
+          type="text"
+          placeholder="Search products..."
+          [(ngModel)]="searchTerm"
+          (keyup.enter)="onSearch()"
+        />
+        <button type="button" (click)="onSearch()">Search</button>
+      </div>
+
+      <!-- Actions -->
+      <div class="header-actions">
+        <!-- Cart -->
+        <button
+          type="button"
+          class="action-btn"
+          (click)="goToCart()"
+          title="Cart"
+        >
+          <i class="bi bi-bag"></i>
+          <span
+            class="badge-count"
+            *ngIf="cartCount() > 0"
+          >
+            {{ cartCount() }}
+          </span>
+        </button>
+
+        <!-- Account (logged in) -->
+        <div class="account-menu" *ngIf="isLoggedIn(); else guestMenu">
+          <button class="action-btn" (click)="toggleMenu()">
+            <i class="bi bi-person-circle"></i>
+            <span class="d-none d-md-inline ms-1">
+              {{ user()?.fullName?.split(' ')?.[0] || 'Account' }}
+            </span>
+          </button>
+          <div class="dropdown" *ngIf="menuOpen()">
+            <a (click)="goToAccount()" class="dropdown-item">
+              <i class="bi bi-receipt"></i> My Orders
+            </a>
+            <a routerLink="/merchant" class="dropdown-item">
+              <i class="bi bi-speedometer2"></i> Dashboard
+            </a>
+            <div class="divider"></div>
+            <a (click)="logout()" class="dropdown-item text-danger">
+              <i class="bi bi-box-arrow-right"></i> Logout
+            </a>
+          </div>
+        </div>
+
+        <!-- Guest menu -->
+        <ng-template #guestMenu>
+          <a [routerLink]="['/login']" class="action-btn">
+            <i class="bi bi-person"></i>
+            <span class="d-none d-md-inline ms-1">Sign In</span>
+          </a>
+        </ng-template>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile search -->
+  <div class="mobile-search d-md-none">
+    <div class="container">
+      <div class="search-box">
+        <i class="bi bi-search"></i>
+        <input
+          type="text"
+          placeholder="Search products..."
+          [(ngModel)]="searchTerm"
+          (keyup.enter)="onSearch()"
+        />
+      </div>
+    </div>
+  </div>
+
+  <!-- Nav bar -->
+  <nav class="nav-bar">
+    <div class="container nav-bar-inner">
+      <a [routerLink]="['/store', store?.slug]" class="nav-link">
+        <i class="bi bi-house-door"></i> Home
+      </a>
+      <a [routerLink]="['/store', store?.slug, 'products']" class="nav-link">
+        <i class="bi bi-grid"></i> All Products
+      </a>
+      <a routerLink="/" class="nav-link d-none d-md-flex">
+        <i class="bi bi-shop"></i> ShopNest
+      </a>
+    </div>
+  </nav>
+</header>

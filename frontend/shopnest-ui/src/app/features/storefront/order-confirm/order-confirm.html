@@ -1,0 +1,184 @@
+<app-store-header *ngIf="store()" [store]="store()!"></app-store-header>
+
+<main class="confirm-page">
+  <div class="container">
+    <!-- Loading -->
+    <div *ngIf="loading()" class="loading-page">
+      <div class="spinner-border text-primary"></div>
+    </div>
+
+    <!-- Error -->
+    <div *ngIf="!loading() && error()" class="error-state">
+      <i class="bi bi-exclamation-circle"></i>
+      <h3>Order not found</h3>
+      <p>{{ error() }}</p>
+      <a routerLink="/" class="btn btn-primary mt-3">Go Home</a>
+    </div>
+
+    <!-- Success -->
+    <ng-container *ngIf="!loading() && !error() && order()">
+      <!-- Success header -->
+      <div class="success-header">
+        <div class="success-icon">
+          <i class="bi bi-check-lg"></i>
+        </div>
+        <h1 class="success-title">Order Placed Successfully!</h1>
+        <p class="success-sub">
+          Thank you for your order. We'll deliver it soon.
+        </p>
+      </div>
+
+      <!-- Order details card -->
+      <div class="order-card">
+        <!-- Top row -->
+        <div class="order-top">
+          <div>
+            <span class="label">Order Number</span>
+            <strong class="value order-num">
+              {{ order()!.order_number }}
+            </strong>
+          </div>
+          <span
+            class="status-badge"
+            [ngClass]="getStatusClass(order()!.status)"
+          >
+            <i class="bi bi-circle-fill"></i>
+            {{ order()!.status }}
+          </span>
+        </div>
+
+        <div class="order-divider"></div>
+
+        <!-- Info grid -->
+        <div class="info-grid">
+          <div class="info-cell">
+            <span class="label">
+              <i class="bi bi-calendar-event"></i> Ordered on
+            </span>
+            <span class="value">
+              {{ order()!.created_at | date: 'medium' }}
+            </span>
+          </div>
+
+          <div class="info-cell">
+            <span class="label">
+              <i class="bi bi-credit-card"></i> Payment Method
+            </span>
+            <span class="value">
+              {{
+                order()!.payment_method === 'COD'
+                  ? 'Cash on Delivery'
+                  : order()!.payment_method
+              }}
+            </span>
+          </div>
+
+          <div class="info-cell">
+            <span class="label">
+              <i class="bi bi-credit-card-2-front"></i> Payment Status
+            </span>
+            <span class="value">
+              {{ order()!.payment_status }}
+            </span>
+          </div>
+        </div>
+
+        <div class="order-divider"></div>
+
+        <!-- Items -->
+        <div class="items-section">
+          <h3 class="section-label">Items Ordered</h3>
+
+          <div class="items-list">
+            <div class="order-item" *ngFor="let item of order()!.items">
+              <div class="item-details">
+                <span class="item-qty">{{ item.quantity }}×</span>
+                <div>
+                  <div class="item-name">{{ item.product_name }}</div>
+                  <div class="item-unit">
+                    {{ item.unit_price_inr | inr }} each
+                  </div>
+                </div>
+              </div>
+              <span class="item-total">
+                {{ item.line_total_inr | inr }}
+              </span>
+            </div>
+          </div>
+
+          <div class="totals">
+            <div class="total-row">
+              <span>Subtotal</span>
+              <span>{{ order()!.subtotal_inr | inr }}</span>
+            </div>
+            <div class="total-row" *ngIf="order()!.discount_inr > 0">
+              <span>Discount</span>
+              <span class="text-success">
+                − {{ order()!.discount_inr | inr }}
+              </span>
+            </div>
+            <div class="total-row grand">
+              <span>Total</span>
+              <strong>{{ order()!.total_inr | inr }}</strong>
+            </div>
+          </div>
+        </div>
+
+        <div class="order-divider"></div>
+
+        <!-- Shipping Address -->
+        <div class="address-section">
+          <h3 class="section-label">
+            <i class="bi bi-geo-alt"></i> Shipping Address
+          </h3>
+          <div class="address-box">
+            <strong>{{ order()!.shipping_address.full_name }}</strong>
+            <div>{{ order()!.shipping_address.line1 }}</div>
+            <div *ngIf="order()!.shipping_address.line2">
+              {{ order()!.shipping_address.line2 }}
+            </div>
+            <div>
+              {{ order()!.shipping_address.city }},
+              {{ order()!.shipping_address.state }} —
+              {{ order()!.shipping_address.pincode }}
+            </div>
+            <div class="mt-1">
+              <i class="bi bi-telephone"></i>
+              {{ order()!.shipping_address.phone }}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="action-buttons">
+        <button
+          type="button"
+          class="btn btn-outline-primary btn-lg"
+          (click)="continueShopping()"
+        >
+          <i class="bi bi-arrow-left me-2"></i>
+          Continue Shopping
+        </button>
+        <button
+          type="button"
+          class="btn btn-primary btn-lg"
+          (click)="goToOrders()"
+        >
+          <i class="bi bi-receipt me-2"></i>
+          View My Orders
+        </button>
+      </div>
+    </ng-container>
+  </div>
+</main>
+
+<!-- Footer -->
+<footer class="store-footer" *ngIf="store()">
+  <div class="container text-center">
+    <p class="mb-0">
+      Powered by
+      <a routerLink="/" class="fw-bold text-primary">ShopNest</a>
+    </p>
+  </div>
+</footer>

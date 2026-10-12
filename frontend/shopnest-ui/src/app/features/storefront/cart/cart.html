@@ -1,0 +1,159 @@
+<app-store-header *ngIf="store()" [store]="store()!"></app-store-header>
+
+<main class="cart-page">
+  <div class="container">
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb-nav">
+      <a [routerLink]="['/store', store()?.slug]" class="crumb">
+        <i class="bi bi-house-door"></i> Home
+      </a>
+      <i class="bi bi-chevron-right crumb-sep"></i>
+      <span class="crumb current">Cart</span>
+    </nav>
+
+    <!-- Header -->
+    <div class="page-header">
+      <h1 class="page-title">Shopping Cart</h1>
+      <p class="page-sub" *ngIf="itemCount() > 0">
+        {{ itemCount() }} {{ itemCount() === 1 ? 'item' : 'items' }} in your cart
+      </p>
+    </div>
+
+    <!-- Loading -->
+    <div *ngIf="loading()" class="loading-page">
+      <div class="spinner-border text-primary"></div>
+    </div>
+
+    <!-- Empty cart -->
+    <div *ngIf="!loading() && itemCount() === 0" class="empty-cart">
+      <i class="bi bi-cart-x"></i>
+      <h3>Your cart is empty</h3>
+      <p>Looks like you haven't added anything yet.</p>
+      <button type="button" class="btn btn-primary btn-lg" (click)="continueShopping()">
+        <i class="bi bi-arrow-left me-2"></i>
+        Continue Shopping
+      </button>
+    </div>
+
+    <!-- Cart with items -->
+    <div *ngIf="!loading() && itemCount() > 0" class="cart-layout">
+      <!-- LEFT: Items -->
+      <div class="cart-items">
+        <div class="cart-item" *ngFor="let item of cart()?.items">
+          <div class="item-image">
+            <img
+              *ngIf="item.image_url; else noImage"
+              [src]="item.image_url"
+              [alt]="item.name"
+            />
+            <ng-template #noImage>
+              <div class="no-image">
+                <i class="bi bi-image"></i>
+              </div>
+            </ng-template>
+          </div>
+
+          <div class="item-details">
+            <h3 class="item-name">{{ item.name }}</h3>
+            <p class="item-price">{{ item.price_inr | inr }}</p>
+            <p class="item-stock small text-muted">
+              {{ item.stock_quantity }} in stock
+            </p>
+          </div>
+
+          <div class="item-qty">
+            <button
+              type="button"
+              class="qty-btn"
+              [disabled]="item.quantity <= 1 || updatingId() === item.id"
+              (click)="decrement(item)"
+            >
+              <i class="bi bi-dash"></i>
+            </button>
+            <span class="qty-value">{{ item.quantity }}</span>
+            <button
+              type="button"
+              class="qty-btn"
+              [disabled]="item.quantity >= item.stock_quantity || updatingId() === item.id"
+              (click)="increment(item)"
+            >
+              <i class="bi bi-plus"></i>
+            </button>
+          </div>
+
+          <div class="item-total">
+            <span class="line-total">{{ item.line_total | inr }}</span>
+            <button
+              type="button"
+              class="btn-remove"
+              (click)="removeItem(item)"
+              [disabled]="updatingId() === item.id"
+              title="Remove"
+            >
+              <i class="bi bi-trash"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: Summary -->
+      <aside class="cart-summary">
+        <h3 class="summary-title">Order Summary</h3>
+
+        <div class="summary-row">
+          <span>Subtotal ({{ itemCount() }} items)</span>
+          <strong>{{ subtotal() | inr }}</strong>
+        </div>
+
+        <div class="summary-row">
+          <span>Delivery</span>
+          <strong class="text-success">FREE</strong>
+        </div>
+
+        <div class="summary-row">
+          <span>Tax</span>
+          <strong>Included</strong>
+        </div>
+
+        <div class="summary-divider"></div>
+
+        <div class="summary-row total-row">
+          <span>Total</span>
+          <strong class="total-amount">{{ subtotal() | inr }}</strong>
+        </div>
+
+        <button
+          type="button"
+          class="btn btn-primary btn-lg w-100 mt-3"
+          (click)="goToCheckout()"
+        >
+          Proceed to Checkout
+          <i class="bi bi-arrow-right ms-2"></i>
+        </button>
+
+        <button
+          type="button"
+          class="btn btn-link w-100 mt-2 text-muted"
+          (click)="continueShopping()"
+        >
+          <i class="bi bi-arrow-left me-1"></i> Continue Shopping
+        </button>
+
+        <div class="summary-note">
+          <i class="bi bi-shield-check"></i>
+          <span>100% Secure Checkout</span>
+        </div>
+      </aside>
+    </div>
+  </div>
+</main>
+
+<!-- Footer -->
+<footer class="store-footer" *ngIf="store()">
+  <div class="container text-center">
+    <p class="mb-0">
+      Powered by
+      <a routerLink="/" class="fw-bold text-primary">ShopNest</a>
+    </p>
+  </div>
+</footer>

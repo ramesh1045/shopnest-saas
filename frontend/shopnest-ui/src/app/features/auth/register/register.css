@@ -1,0 +1,64 @@
+@import '../login/login.css';
+
+/* Role options */
+.role-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.role-option {
+  border: 1.5px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 0.875rem;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: block;
+  position: relative;
+}
+
+.role-option input[type='radio'] {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.role-option:hover {
+  border-color: #d1d5db;
+  background: #fafafa;
+}
+
+.role-option.active {
+  border-color: var(--sn-primary, #ff6b00);
+  background: #fff7ed;
+}
+
+.role-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #111827;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.role-title i {
+  color: var(--sn-primary, #ff6b00);
+  font-size: 16px;
+}
+
+.role-desc {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.link-primary {
+  color: var(--sn-primary, #ff6b00);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.link-primary:hover {
+  text-decoration: underline;
+}

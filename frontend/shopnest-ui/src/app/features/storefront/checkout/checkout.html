@@ -1,0 +1,269 @@
+<app-store-header *ngIf="store()" [store]="store()!"></app-store-header>
+
+<main class="checkout-page">
+  <div class="container">
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb-nav">
+      <a [routerLink]="['/store', store()?.slug]" class="crumb">
+        <i class="bi bi-house-door"></i> Home
+      </a>
+      <i class="bi bi-chevron-right crumb-sep"></i>
+      <a [routerLink]="['/store', store()?.slug, 'cart']" class="crumb">
+        Cart
+      </a>
+      <i class="bi bi-chevron-right crumb-sep"></i>
+      <span class="crumb current">Checkout</span>
+    </nav>
+
+    <!-- Header -->
+    <div class="page-header">
+      <h1 class="page-title">Checkout</h1>
+      <p class="page-sub">Complete your order details</p>
+    </div>
+
+    <!-- Loading -->
+    <div *ngIf="loading()" class="loading-page">
+      <div class="spinner-border text-primary"></div>
+    </div>
+
+    <!-- Form -->
+    <div *ngIf="!loading()" class="checkout-layout">
+      <!-- LEFT: Shipping -->
+      <div class="checkout-form">
+        <div
+          *ngIf="errorMessage()"
+          class="alert alert-danger d-flex align-items-center gap-2"
+        >
+          <i class="bi bi-exclamation-triangle-fill"></i>
+          <span>{{ errorMessage() }}</span>
+        </div>
+
+        <form [formGroup]="form" (ngSubmit)="placeOrder()" novalidate>
+          <!-- Shipping Address -->
+          <section class="form-section">
+            <div class="section-head">
+              <span class="step-num">1</span>
+              <h2>Shipping Address</h2>
+            </div>
+
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label">Full Name *</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  [class.is-invalid]="full_name.invalid && full_name.touched"
+                  formControlName="full_name"
+                  placeholder="Ramesh Kumar"
+                />
+                <div class="invalid-feedback">
+                  Please enter a valid name
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Phone *</label>
+                <input
+                  type="tel"
+                  class="form-control"
+                  [class.is-invalid]="phone.invalid && phone.touched"
+                  formControlName="phone"
+                  placeholder="+91 98765 43210"
+                />
+                <div class="invalid-feedback">
+                  Please enter a valid phone number
+                </div>
+              </div>
+
+              <div class="col-12">
+                <label class="form-label">Address Line 1 *</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  [class.is-invalid]="line1.invalid && line1.touched"
+                  formControlName="line1"
+                  placeholder="House no, street, area"
+                />
+                <div class="invalid-feedback">
+                  Address is required
+                </div>
+              </div>
+
+              <div class="col-12">
+                <label class="form-label">Address Line 2 (optional)</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  formControlName="line2"
+                  placeholder="Landmark, apartment, etc."
+                />
+              </div>
+
+              <div class="col-md-4">
+                <label class="form-label">City *</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  [class.is-invalid]="city.invalid && city.touched"
+                  formControlName="city"
+                  placeholder="Chennai"
+                />
+                <div class="invalid-feedback">City is required</div>
+              </div>
+
+              <div class="col-md-4">
+                <label class="form-label">State *</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  [class.is-invalid]="state.invalid && state.touched"
+                  formControlName="state"
+                  placeholder="Tamil Nadu"
+                />
+                <div class="invalid-feedback">State is required</div>
+              </div>
+
+              <div class="col-md-4">
+                <label class="form-label">Pincode *</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  [class.is-invalid]="pincode.invalid && pincode.touched"
+                  formControlName="pincode"
+                  placeholder="600040"
+                />
+                <div class="invalid-feedback">Enter a valid pincode</div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Payment Method -->
+          <section class="form-section">
+            <div class="section-head">
+              <span class="step-num">2</span>
+              <h2>Payment Method</h2>
+            </div>
+
+            <div class="payment-options">
+              <label
+                class="payment-option"
+                [class.active]="paymentMethod() === 'COD'"
+              >
+                <input
+                  type="radio"
+                  name="payment"
+                  [checked]="paymentMethod() === 'COD'"
+                  (change)="selectPayment('COD')"
+                />
+                <div class="pay-icon">
+                  <i class="bi bi-cash-coin"></i>
+                </div>
+                <div>
+                  <div class="pay-title">Cash on Delivery</div>
+                  <div class="pay-desc">Pay when your order arrives</div>
+                </div>
+              </label>
+
+              <label
+                class="payment-option disabled"
+                [class.active]="paymentMethod() === 'SIMULATED'"
+              >
+                <input
+                  type="radio"
+                  name="payment"
+                  disabled
+                />
+                <div class="pay-icon">
+                  <i class="bi bi-credit-card"></i>
+                </div>
+                <div>
+                  <div class="pay-title">
+                    Online Payment
+                    <span class="badge-soon">Coming Soon</span>
+                  </div>
+                  <div class="pay-desc">UPI, Cards, Netbanking</div>
+                </div>
+              </label>
+            </div>
+          </section>
+        </form>
+      </div>
+
+      <!-- RIGHT: Order Summary -->
+      <aside class="order-summary">
+        <h3 class="summary-title">Order Summary</h3>
+
+        <!-- Items -->
+        <div class="summary-items">
+          <div class="summary-item" *ngFor="let item of cart()?.items">
+            <div class="item-info">
+              <span class="item-qty">{{ item.quantity }}×</span>
+              <span class="item-name">{{ item.name }}</span>
+            </div>
+            <span class="item-total">{{ item.line_total | inr }}</span>
+          </div>
+        </div>
+
+        <div class="summary-divider"></div>
+
+        <div class="summary-row">
+          <span>Subtotal ({{ itemCount() }} items)</span>
+          <strong>{{ subtotal() | inr }}</strong>
+        </div>
+
+        <div class="summary-row">
+          <span>Delivery</span>
+          <strong class="text-success">FREE</strong>
+        </div>
+
+        <div class="summary-row">
+          <span>Tax</span>
+          <strong>Included</strong>
+        </div>
+
+        <div class="summary-divider"></div>
+
+        <div class="summary-row total-row">
+          <span>Total</span>
+          <strong class="total-amount">{{ subtotal() | inr }}</strong>
+        </div>
+
+        <button
+          type="button"
+          class="btn btn-primary btn-lg w-100 mt-3"
+          [disabled]="placing() || itemCount() === 0"
+          (click)="placeOrder()"
+        >
+          <span
+            *ngIf="placing()"
+            class="spinner-border spinner-border-sm me-2"
+          ></span>
+          {{ placing() ? 'Placing Order...' : 'Place Order' }}
+          <i *ngIf="!placing()" class="bi bi-arrow-right ms-2"></i>
+        </button>
+
+        <a
+          [routerLink]="['/store', store()?.slug, 'cart']"
+          class="back-link"
+        >
+          <i class="bi bi-arrow-left"></i> Back to Cart
+        </a>
+
+        <div class="summary-note">
+          <i class="bi bi-shield-check"></i>
+          <span>Safe & Secure Checkout</span>
+        </div>
+      </aside>
+    </div>
+  </div>
+</main>
+
+<!-- Footer -->
+<footer class="store-footer" *ngIf="store()">
+  <div class="container text-center">
+    <p class="mb-0">
+      Powered by
+      <a routerLink="/" class="fw-bold text-primary">ShopNest</a>
+    </p>
+  </div>
+</footer>

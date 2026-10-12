@@ -1,0 +1,167 @@
+<!-- Loading state -->
+<div *ngIf="loading()" class="loading-page">
+  <div class="spinner-border text-primary" role="status">
+    <span class="visually-hidden">Loading...</span>
+  </div>
+</div>
+
+<!-- Error state -->
+<div *ngIf="!loading() && error()" class="error-page">
+  <div class="text-center">
+    <i class="bi bi-shop-window"></i>
+    <h2>Store not found</h2>
+    <p class="text-muted">{{ error() }}</p>
+    <a routerLink="/" class="btn btn-primary">Go Home</a>
+  </div>
+</div>
+
+<!-- Main content -->
+<ng-container *ngIf="!loading() && !error() && store()">
+  <app-store-header [store]="store()!"></app-store-header>
+
+  <main class="store-main">
+    <!-- Hero Banner -->
+    <section class="store-hero">
+      <div class="container">
+        <div class="hero-inner">
+          <div class="hero-content">
+            <span class="hero-badge">
+              <i class="bi bi-shop"></i>
+              Welcome to
+            </span>
+            <h1 class="hero-title">{{ store()!.name }}</h1>
+            <p class="hero-sub" *ngIf="store()!.description">
+              {{ store()!.description }}
+            </p>
+            <a
+              [routerLink]="['/store', store()!.slug, 'products']"
+              class="btn btn-primary btn-lg"
+            >
+              Shop Now
+              <i class="bi bi-arrow-right ms-1"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Featured Products -->
+    <section class="section">
+      <div class="container">
+        <div class="section-header">
+          <div>
+            <h2 class="section-title">Featured Products</h2>
+            <p class="section-sub">Handpicked for you</p>
+          </div>
+          <a
+            [routerLink]="['/store', store()!.slug, 'products']"
+            class="view-all-link"
+          >
+            View all <i class="bi bi-arrow-right"></i>
+          </a>
+        </div>
+
+        <div *ngIf="products().length === 0" class="empty-state">
+          <i class="bi bi-box-seam"></i>
+          <h4>No products yet</h4>
+          <p>This store hasn't added products.</p>
+        </div>
+
+        <div *ngIf="products().length > 0" class="product-grid">
+          <div
+            class="product-card"
+            *ngFor="let p of products()"
+            [routerLink]="['/store', store()!.slug, 'product', p.id]"
+          >
+            <div class="product-image">
+<img
+  *ngIf="p.image_url; else noImage"
+  [src]="p.image_url"
+  [alt]="p.name"
+/>
+<ng-template #noImage>
+  <div class="no-image">
+    <i class="bi bi-image"></i>
+    <span>{{ p.name }}</span>
+  </div>
+</ng-template>
+              <span class="stock-badge" *ngIf="p.stock_quantity === 0">
+                Out of stock
+              </span>
+            </div>
+            <div class="product-info">
+              <h3 class="product-name">{{ p.name }}</h3>
+              <div class="product-price">
+                <span class="price-current">{{ p.price_inr | inr }}</span>
+                <span
+                  class="price-old"
+                  *ngIf="p.compare_price_inr && p.compare_price_inr > p.price_inr"
+                >
+                  {{ p.compare_price_inr | inr }}
+                </span>
+              </div>
+              <button
+                type="button"
+                class="btn btn-primary btn-sm w-100 mt-2"
+                [disabled]="p.stock_quantity === 0"
+                (click)="addToCart(p, $event)"
+              >
+                <i class="bi bi-bag-plus me-1"></i>
+                {{ p.stock_quantity === 0 ? 'Out of Stock' : 'Add to Cart' }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Info strip -->
+    <section class="info-strip">
+      <div class="container">
+        <div class="info-grid">
+          <div class="info-item">
+            <i class="bi bi-truck"></i>
+            <div>
+              <strong>Free Delivery</strong>
+              <p>On all orders</p>
+            </div>
+          </div>
+          <div class="info-item">
+            <i class="bi bi-shield-check"></i>
+            <div>
+              <strong>Secure Payments</strong>
+              <p>COD available</p>
+            </div>
+          </div>
+          <div class="info-item">
+            <i class="bi bi-arrow-repeat"></i>
+            <div>
+              <strong>Easy Returns</strong>
+              <p>7-day return policy</p>
+            </div>
+          </div>
+          <div class="info-item">
+            <i class="bi bi-headset"></i>
+            <div>
+              <strong>24/7 Support</strong>
+              <p>Always here to help</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="store-footer">
+    <div class="container text-center">
+      <p class="mb-0">
+        Powered by
+        <a routerLink="/" class="fw-bold text-primary">ShopNest</a>
+      </p>
+      <p class="text-muted small mb-0 mt-1">
+        © 2026 {{ store()!.name }}. All rights reserved.
+      </p>
+    </div>
+  </footer>
+</ng-container>

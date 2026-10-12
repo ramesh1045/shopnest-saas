@@ -1,0 +1,52 @@
+@import 'bootstrap/dist/css/bootstrap.min.css';
+@import 'bootstrap-icons/font/bootstrap-icons.css';
+
+:root {
+  --sn-primary: #FF6B00;
+  --sn-primary-hover: #E55F00;
+  --sn-dark: #1A1A1A;
+  --sn-text: #111827;
+  --sn-text-muted: #6B7280;
+  --sn-border: #E5E7EB;
+  --sn-surface: #F9FAFB;
+}
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  font-size: 14px;
+  color: var(--sn-text);
+  margin: 0;
+}
+
+/* CRITICAL — Override Bootstrap blue with orange */
+.text-primary {
+  color: var(--sn-primary) !important;
+}
+
+.bg-primary {
+  background-color: var(--sn-primary) !important;
+}
+
+.btn-primary {
+  background: var(--sn-primary);
+  border-color: var(--sn-primary);
+}
+.btn-primary:hover,
+.btn-primary:focus {
+  background: var(--sn-primary-hover);
+  border-color: var(--sn-primary-hover);
+}
+
+a {
+  color: var(--sn-primary);
+  text-decoration: none;
+}
+a:hover {
+  color: var(--sn-primary-hover);
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--sn-primary);
+  box-shadow: 0 0 0 3px rgba(255, 107, 0, 0.12);
+}

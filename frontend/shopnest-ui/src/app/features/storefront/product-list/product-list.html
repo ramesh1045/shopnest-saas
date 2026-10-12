@@ -1,0 +1,194 @@
+<!-- Store Header -->
+<app-store-header *ngIf="store()" [store]="store()!"></app-store-header>
+
+<main class="products-page">
+  <div class="container">
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb-nav">
+      <a [routerLink]="['/store', store()?.slug]" class="crumb">
+        <i class="bi bi-house-door"></i> Home
+      </a>
+      <i class="bi bi-chevron-right crumb-sep"></i>
+      <span class="crumb current">Products</span>
+    </nav>
+
+    <!-- Header -->
+    <div class="page-header">
+      <div>
+        <h1 class="page-title">All Products</h1>
+        <p class="page-sub" *ngIf="!loading()">
+          {{ total() }} {{ total() === 1 ? 'product' : 'products' }} found
+        </p>
+      </div>
+    </div>
+
+    <!-- Filters Bar -->
+    <div class="filters-bar">
+      <!-- Search -->
+      <div class="filter-search">
+        <i class="bi bi-search"></i>
+        <input
+          type="text"
+          placeholder="Search products..."
+          [ngModel]="searchTerm()"
+          (ngModelChange)="onSearchInput($event)"
+        />
+      </div>
+
+      <!-- Category -->
+      <select
+        class="filter-select"
+        [ngModel]="selectedCategoryId()"
+        (ngModelChange)="onCategoryChange($event)"
+      >
+        <option [ngValue]="null">All Categories</option>
+        <option *ngFor="let c of categories()" [ngValue]="c.id">
+          {{ c.name }}
+        </option>
+      </select>
+
+      <!-- Sort -->
+      <select
+        class="filter-select"
+        [ngModel]="sortBy()"
+        (ngModelChange)="onSortChange($event)"
+      >
+        <option value="newest">Newest First</option>
+        <option value="price_asc">Price: Low to High</option>
+        <option value="price_desc">Price: High to Low</option>
+      </select>
+
+      <!-- Clear -->
+      <button
+        type="button"
+        class="btn-clear"
+        *ngIf="searchTerm() || selectedCategoryId()"
+        (click)="clearFilters()"
+      >
+        <i class="bi bi-x-circle"></i> Clear
+      </button>
+    </div>
+
+    <!-- Loading -->
+    <div *ngIf="loading()" class="loading-grid">
+      <div class="skeleton-card" *ngFor="let i of [1,2,3,4,5,6,7,8]">
+        <div class="skeleton-img"></div>
+        <div class="skeleton-line"></div>
+        <div class="skeleton-line short"></div>
+      </div>
+    </div>
+
+    <!-- Empty -->
+    <div *ngIf="!loading() && products().length === 0" class="empty-state">
+      <i class="bi bi-search"></i>
+      <h3>No products found</h3>
+      <p>Try adjusting your filters or search.</p>
+      <button type="button" class="btn btn-primary" (click)="clearFilters()">
+        Clear Filters
+      </button>
+    </div>
+
+    <!-- Product Grid -->
+    <div *ngIf="!loading() && products().length > 0" class="product-grid">
+      <div
+        class="product-card"
+        *ngFor="let p of products()"
+        [routerLink]="['/store', store()!.slug, 'product', p.id]"
+      >
+        <div class="product-image">
+          <img
+            *ngIf="p.image_url; else noImage"
+            [src]="p.image_url"
+            [alt]="p.name"
+          />
+          <ng-template #noImage>
+            <div class="no-image">
+              <i class="bi bi-image"></i>
+              <span>{{ p.name }}</span>
+            </div>
+          </ng-template>
+          <span class="stock-badge" *ngIf="p.stock_quantity === 0">
+            Out of Stock
+          </span>
+          <span
+            class="discount-badge"
+            *ngIf="p.compare_price_inr && p.compare_price_inr > p.price_inr"
+          >
+            {{
+              ((p.compare_price_inr - p.price_inr) / p.compare_price_inr) * 100
+                | number: '1.0-0'
+            }}% OFF
+          </span>
+        </div>
+        <div class="product-info">
+          <h3 class="product-name">{{ p.name }}</h3>
+          <div class="product-price">
+            <span class="price-current">{{ p.price_inr | inr }}</span>
+            <span
+              class="price-old"
+              *ngIf="p.compare_price_inr && p.compare_price_inr > p.price_inr"
+            >
+              {{ p.compare_price_inr | inr }}
+            </span>
+          </div>
+          <button
+            type="button"
+            class="btn btn-primary btn-sm w-100 mt-2"
+            [disabled]="p.stock_quantity === 0"
+            (click)="addToCart(p, $event)"
+          >
+            <i class="bi bi-bag-plus me-1"></i>
+            {{ p.stock_quantity === 0 ? 'Out of Stock' : 'Add to Cart' }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pagination -->
+    <div
+      *ngIf="!loading() && totalPages() > 1"
+      class="pagination-wrap"
+    >
+      <button
+        type="button"
+        class="page-btn"
+        [disabled]="currentPage() === 1"
+        (click)="goToPage(currentPage() - 1)"
+      >
+        <i class="bi bi-chevron-left"></i>
+      </button>
+
+      <ng-container *ngFor="let page of getPages()">
+        <span *ngIf="page < 0" class="page-ellipsis">...</span>
+        <button
+          *ngIf="page > 0"
+          type="button"
+          class="page-btn"
+          [class.active]="page === currentPage()"
+          (click)="goToPage(page)"
+        >
+          {{ page }}
+        </button>
+      </ng-container>
+
+      <button
+        type="button"
+        class="page-btn"
+        [disabled]="currentPage() === totalPages()"
+        (click)="goToPage(currentPage() + 1)"
+      >
+        <i class="bi bi-chevron-right"></i>
+      </button>
+    </div>
+  </div>
+</main>
+
+<!-- Footer -->
+<footer class="store-footer" *ngIf="store()">
+  <div class="container text-center">
+    <p class="mb-0">
+      Powered by
+      <a routerLink="/" class="fw-bold text-primary">ShopNest</a>
+    </p>
+  </div>
+</footer>

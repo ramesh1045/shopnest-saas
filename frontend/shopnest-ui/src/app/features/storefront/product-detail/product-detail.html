@@ -1,0 +1,204 @@
+<app-store-header *ngIf="store()" [store]="store()!"></app-store-header>
+
+<main class="product-page">
+  <div class="container">
+    <!-- Loading -->
+    <div *ngIf="loading()" class="loading-page">
+      <div class="spinner-border text-primary"></div>
+    </div>
+
+    <!-- Error -->
+    <div *ngIf="!loading() && error()" class="empty-state">
+      <i class="bi bi-exclamation-circle"></i>
+      <h3>{{ error() }}</h3>
+      <a
+        [routerLink]="['/store', store()?.slug, 'products']"
+        class="btn btn-primary mt-3"
+      >
+        Back to Products
+      </a>
+    </div>
+
+    <!-- Content -->
+    <ng-container *ngIf="!loading() && !error() && product() && store()">
+      <!-- Breadcrumb -->
+      <nav class="breadcrumb-nav">
+        <a [routerLink]="['/store', store()!.slug]" class="crumb">
+          <i class="bi bi-house-door"></i> Home
+        </a>
+        <i class="bi bi-chevron-right crumb-sep"></i>
+        <a [routerLink]="['/store', store()!.slug, 'products']" class="crumb">
+          Products
+        </a>
+        <i class="bi bi-chevron-right crumb-sep"></i>
+        <span class="crumb current">{{ product()!.name }}</span>
+      </nav>
+
+      <div class="product-layout">
+        <!-- LEFT: Image -->
+        <div class="product-image-side">
+          <div class="product-image-box">
+            <img
+              *ngIf="product()!.image_url; else noImage"
+              [src]="product()!.image_url"
+              [alt]="product()!.name"
+            />
+            <ng-template #noImage>
+              <div class="no-image-large">
+                <i class="bi bi-image"></i>
+                <span>{{ product()!.name }}</span>
+              </div>
+            </ng-template>
+
+            <span
+              class="discount-flag"
+              *ngIf="getDiscountPercent() > 0"
+            >
+              {{ getDiscountPercent() }}% OFF
+            </span>
+          </div>
+        </div>
+
+        <!-- RIGHT: Info -->
+        <div class="product-info-side">
+          <span class="product-category" *ngIf="product()!.category_name">
+            {{ product()!.category_name }}
+          </span>
+
+          <h1 class="product-title">{{ product()!.name }}</h1>
+
+          <!-- Price -->
+          <div class="product-price-row">
+            <span class="price-current">
+              {{ product()!.price_inr | inr }}
+            </span>
+            <span
+              class="price-old"
+              *ngIf="
+                product()!.compare_price_inr &&
+                product()!.compare_price_inr! > product()!.price_inr
+              "
+            >
+              {{ product()!.compare_price_inr | inr }}
+            </span>
+            <span
+              class="price-save"
+              *ngIf="getDiscountPercent() > 0"
+            >
+              Save {{ getDiscountPercent() }}%
+            </span>
+          </div>
+
+          <p class="price-note">Inclusive of all taxes</p>
+
+          <!-- Stock status -->
+          <div class="stock-row">
+            <span
+              class="stock-status in"
+              *ngIf="product()!.stock_quantity > 0"
+            >
+              <i class="bi bi-check-circle-fill"></i>
+              In Stock · {{ product()!.stock_quantity }} available
+            </span>
+            <span
+              class="stock-status out"
+              *ngIf="product()!.stock_quantity === 0"
+            >
+              <i class="bi bi-x-circle-fill"></i>
+              Out of Stock
+            </span>
+          </div>
+
+          <!-- Description -->
+          <div class="product-desc" *ngIf="product()!.description">
+            <h3>Description</h3>
+            <p>{{ product()!.description }}</p>
+          </div>
+
+          <!-- SKU -->
+          <div class="sku-row" *ngIf="product()!.sku">
+            <span class="label">SKU:</span>
+            <span class="value">{{ product()!.sku }}</span>
+          </div>
+
+          <!-- Quantity + Add to cart -->
+          <div class="action-block">
+            <div class="qty-row">
+              <label class="qty-label">Quantity</label>
+              <div class="qty-selector">
+                <button
+                  type="button"
+                  (click)="decrementQty()"
+                  [disabled]="quantity() <= 1"
+                >
+                  <i class="bi bi-dash"></i>
+                </button>
+                <input
+                  type="number"
+                  [value]="quantity()"
+                  (change)="onQuantityInput($any($event.target).value)"
+                  min="1"
+                  [max]="product()!.stock_quantity"
+                />
+                <button
+                  type="button"
+                  (click)="incrementQty()"
+                  [disabled]="quantity() >= product()!.stock_quantity"
+                >
+                  <i class="bi bi-plus"></i>
+                </button>
+              </div>
+            </div>
+
+            <div class="action-buttons">
+              <button
+                type="button"
+                class="btn btn-outline-primary btn-lg flex-fill"
+                [disabled]="product()!.stock_quantity === 0 || addingToCart()"
+                (click)="addToCart(false)"
+              >
+                <i class="bi bi-bag-plus me-2"></i>
+                Add to Cart
+              </button>
+              <button
+                type="button"
+                class="btn btn-primary btn-lg flex-fill"
+                [disabled]="product()!.stock_quantity === 0 || addingToCart()"
+                (click)="addToCart(true)"
+              >
+                <i class="bi bi-lightning-charge-fill me-2"></i>
+                Buy Now
+              </button>
+            </div>
+          </div>
+
+          <!-- Trust badges -->
+          <div class="trust-grid">
+            <div class="trust-item">
+              <i class="bi bi-truck"></i>
+              <span>Free Delivery</span>
+            </div>
+            <div class="trust-item">
+              <i class="bi bi-arrow-repeat"></i>
+              <span>7-day Returns</span>
+            </div>
+            <div class="trust-item">
+              <i class="bi bi-shield-check"></i>
+              <span>Secure Payment</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+  </div>
+</main>
+
+<!-- Footer -->
+<footer class="store-footer" *ngIf="store()">
+  <div class="container text-center">
+    <p class="mb-0">
+      Powered by
+      <a routerLink="/" class="fw-bold text-primary">ShopNest</a>
+    </p>
+  </div>
+</footer>
