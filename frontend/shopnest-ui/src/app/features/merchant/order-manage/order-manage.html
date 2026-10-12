@@ -1,1 +1,185 @@
-<p>order-manage works!</p>
+<div class="page">
+  <!-- Header -->
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Orders</h1>
+      <p class="page-sub" *ngIf="!loading()">
+        {{ total() }} {{ total() === 1 ? 'order' : 'orders' }} in your store
+      </p>
+    </div>
+  </div>
+
+  <!-- Filter bar -->
+  <div class="filters-bar">
+    <div class="status-tabs">
+      <button
+        type="button"
+        class="status-tab"
+        [class.active]="statusFilter() === 'all'"
+        (click)="statusFilter.set('all'); onStatusFilterChange()"
+      >
+        All
+      </button>
+      <button
+        *ngFor="let s of statuses"
+        type="button"
+        class="status-tab"
+        [class.active]="statusFilter() === s"
+        (click)="statusFilter.set(s); onStatusFilterChange()"
+      >
+        {{ s }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading()" class="loading-block">
+    <div class="spinner-border text-primary"></div>
+  </div>
+
+  <!-- Empty -->
+  <div *ngIf="!loading() && orders().length === 0" class="empty-block">
+    <i class="bi bi-receipt"></i>
+    <h3>No orders found</h3>
+    <p *ngIf="statusFilter() !== 'all'">
+      Try a different status filter.
+    </p>
+    <p *ngIf="statusFilter() === 'all'">
+      Orders will appear here once customers start buying.
+    </p>
+  </div>
+
+  <!-- Orders list -->
+  <div *ngIf="!loading() && orders().length > 0" class="orders-list">
+    <div *ngFor="let order of orders()" class="order-card">
+      <!-- Top row -->
+      <div class="order-top">
+        <div class="order-id-block">
+          <a
+            [routerLink]="['/merchant/orders', order.id]"
+            class="order-number"
+          >
+            {{ order.order_number }}
+          </a>
+          <div class="order-date">
+            {{ order.created_at | date: 'medium' }}
+          </div>
+        </div>
+
+        <div class="order-status-block">
+          <span
+            class="status-badge"
+            [ngClass]="getStatusClass(order.status)"
+          >
+            <i class="bi" [ngClass]="getStatusIcon(order.status)"></i>
+            {{ order.status }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Middle: customer + total -->
+      <div class="order-mid">
+        <div class="order-cell">
+          <span class="cell-label">Customer</span>
+          <span class="cell-value">
+            {{ order.customer_name || 'Guest' }}
+            <span
+              class="cell-sub"
+              *ngIf="order.customer_phone"
+            >
+              {{ order.customer_phone }}
+            </span>
+          </span>
+        </div>
+
+        <div class="order-cell">
+          <span class="cell-label">Payment</span>
+          <span class="cell-value">
+            {{ order.payment_method === 'COD' ? 'Cash on Delivery' : order.payment_method }}
+          </span>
+        </div>
+
+        <div class="order-cell">
+          <span class="cell-label">Total</span>
+          <span class="cell-value total-value">
+            {{ order.total_inr | inr }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="order-actions">
+        <a
+          [routerLink]="['/merchant/orders', order.id]"
+          class="btn btn-ghost btn-sm"
+        >
+          <i class="bi bi-eye me-1"></i> View Details
+        </a>
+
+        <!-- Quick advance status -->
+        <button
+          *ngIf="getNextStatus(order.status) && order.status !== 'CANCELLED'"
+          type="button"
+          class="btn btn-primary btn-sm"
+          [disabled]="updatingId() === order.id"
+          (click)="quickUpdateStatus(order, getNextStatus(order.status)!)"
+        >
+          <span
+            *ngIf="updatingId() === order.id"
+            class="spinner-border spinner-border-sm me-1"
+          ></span>
+          <i
+            *ngIf="updatingId() !== order.id"
+            class="bi bi-arrow-right-circle me-1"
+          ></i>
+          Move to {{ getNextStatus(order.status) }}
+        </button>
+
+        <!-- Cancel -->
+        <button
+          *ngIf="canCancel(order.status)"
+          type="button"
+          class="btn btn-danger-outline btn-sm"
+          [disabled]="updatingId() === order.id"
+          (click)="quickUpdateStatus(order, 'CANCELLED')"
+        >
+          <i class="bi bi-x-circle me-1"></i> Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pagination -->
+  <div *ngIf="!loading() && totalPages() > 1" class="pagination-wrap">
+    <button
+      type="button"
+      class="page-btn"
+      [disabled]="currentPage() === 1"
+      (click)="goToPage(currentPage() - 1)"
+    >
+      <i class="bi bi-chevron-left"></i>
+    </button>
+
+    <ng-container *ngFor="let page of getPages()">
+      <span *ngIf="page < 0" class="page-ellipsis">...</span>
+      <button
+        *ngIf="page > 0"
+        type="button"
+        class="page-btn"
+        [class.active]="page === currentPage()"
+        (click)="goToPage(page)"
+      >
+        {{ page }}
+      </button>
+    </ng-container>
+
+    <button
+      type="button"
+      class="page-btn"
+      [disabled]="currentPage() === totalPages()"
+      (click)="goToPage(currentPage() + 1)"
+    >
+      <i class="bi bi-chevron-right"></i>
+    </button>
+  </div>
+</div>
