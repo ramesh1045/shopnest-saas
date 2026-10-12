@@ -1,1 +1,208 @@
-<p>stores-manage works!</p>
+<div class="page">
+  <!-- Header -->
+  <div class="page-header">
+    <div>
+      <h2 class="page-title">Stores</h2>
+      <p class="page-sub" *ngIf="!loading()">
+        {{ total() }} {{ total() === 1 ? 'store' : 'stores' }} on platform
+      </p>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters-bar">
+    <div class="filter-search">
+      <i class="bi bi-search"></i>
+      <input
+        type="text"
+        placeholder="Search by name or slug..."
+        [ngModel]="searchTerm()"
+        (ngModelChange)="onSearchChange($event)"
+      />
+    </div>
+
+    <select
+      class="filter-select"
+      [ngModel]="statusFilter()"
+      (ngModelChange)="statusFilter.set($event); onStatusChange()"
+    >
+      <option value="all">All Status</option>
+      <option value="ACTIVE">Active</option>
+      <option value="SUSPENDED">Suspended</option>
+      <option value="PENDING">Pending</option>
+    </select>
+
+    <button
+      type="button"
+      class="btn-clear"
+      *ngIf="hasFilters()"
+      (click)="clearFilters()"
+    >
+      <i class="bi bi-x-circle"></i> Clear
+    </button>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading()" class="loading-block">
+    <div class="spinner-border text-primary"></div>
+  </div>
+
+  <!-- Empty -->
+  <div *ngIf="!loading() && stores().length === 0" class="empty-block">
+    <i class="bi bi-shop"></i>
+    <h3>No stores found</h3>
+    <p *ngIf="hasFilters()">Try adjusting your filters.</p>
+    <p *ngIf="!hasFilters()">No stores registered yet.</p>
+    <button
+      *ngIf="hasFilters()"
+      class="btn btn-outline-primary mt-2"
+      (click)="clearFilters()"
+    >
+      Clear Filters
+    </button>
+  </div>
+
+  <!-- Store cards -->
+  <div *ngIf="!loading() && stores().length > 0" class="stores-list">
+    <div *ngFor="let store of stores()" class="store-card">
+      <!-- Top row -->
+      <div class="store-top">
+        <div class="store-identity">
+          <div class="store-avatar">
+            {{ getStoreInitial(store.name) }}
+          </div>
+          <div>
+            <div class="store-name">{{ store.name }}</div>
+            <div class="store-slug">/store/{{ store.slug }}</div>
+          </div>
+        </div>
+
+        <div class="store-badges">
+          <span
+            class="status-badge"
+            [ngClass]="getStatusClass(store.status)"
+          >
+            <i class="bi bi-circle-fill"></i>
+            {{ store.status }}
+          </span>
+          <span
+            class="plan-badge"
+            [ngClass]="getPlanClass(store.plan_code)"
+            *ngIf="store.plan_code"
+          >
+            {{ store.plan_code }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Stats -->
+      <div class="store-stats">
+        <div class="stat-item">
+          <span class="stat-label">Owner</span>
+          <span class="stat-value">
+            {{ store.owner_name || store.owner_email }}
+          </span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Products</span>
+          <span class="stat-value">{{ store.product_count }}</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Orders</span>
+          <span class="stat-value">{{ store.order_count }}</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Revenue</span>
+          <span class="stat-value highlight">
+            {{ store.revenue_inr | inr }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="store-actions">
+        <div class="store-joined">
+          <i class="bi bi-calendar"></i>
+          Joined {{ store.created_at | date: 'mediumDate' }}
+        </div>
+        <div class="action-buttons">
+          <a
+            [href]="'/store/' + store.slug"
+            target="_blank"
+            class="btn btn-ghost btn-sm"
+          >
+            <i class="bi bi-box-arrow-up-right"></i> View
+          </a>
+          <button
+            *ngIf="store.status === 'ACTIVE'"
+            type="button"
+            class="btn btn-danger-outline btn-sm"
+            [disabled]="updatingId() === store.id"
+            (click)="toggleStatus(store)"
+          >
+            <span
+              *ngIf="updatingId() === store.id"
+              class="spinner-border spinner-border-sm me-1"
+            ></span>
+            <i
+              *ngIf="updatingId() !== store.id"
+              class="bi bi-pause-circle me-1"
+            ></i>
+            Suspend
+          </button>
+          <button
+            *ngIf="store.status === 'SUSPENDED'"
+            type="button"
+            class="btn btn-success-outline btn-sm"
+            [disabled]="updatingId() === store.id"
+            (click)="toggleStatus(store)"
+          >
+            <span
+              *ngIf="updatingId() === store.id"
+              class="spinner-border spinner-border-sm me-1"
+            ></span>
+            <i
+              *ngIf="updatingId() !== store.id"
+              class="bi bi-play-circle me-1"
+            ></i>
+            Activate
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pagination -->
+  <div *ngIf="!loading() && totalPages() > 1" class="pagination-wrap">
+    <button
+      type="button"
+      class="page-btn"
+      [disabled]="currentPage() === 1"
+      (click)="goToPage(currentPage() - 1)"
+    >
+      <i class="bi bi-chevron-left"></i>
+    </button>
+
+    <ng-container *ngFor="let page of getPages()">
+      <span *ngIf="page < 0" class="page-ellipsis">...</span>
+      <button
+        *ngIf="page > 0"
+        type="button"
+        class="page-btn"
+        [class.active]="page === currentPage()"
+        (click)="goToPage(page)"
+      >
+        {{ page }}
+      </button>
+    </ng-container>
+
+    <button
+      type="button"
+      class="page-btn"
+      [disabled]="currentPage() === totalPages()"
+      (click)="goToPage(currentPage() + 1)"
+    >
+      <i class="bi bi-chevron-right"></i>
+    </button>
+  </div>
+</div>
