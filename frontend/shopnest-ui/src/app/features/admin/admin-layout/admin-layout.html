@@ -1,0 +1,87 @@
+<div class="admin-shell">
+  <!-- Sidebar -->
+  <aside class="admin-sidebar">
+    <div class="sidebar-brand">
+      <span class="brand-mark">SN</span>
+      <div>
+        <div class="brand-text">ShopNest</div>
+        <div class="brand-sub">Platform Admin</div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a
+        *ngFor="let item of navItems"
+        [routerLink]="item.path"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: item.exact }"
+        class="nav-item"
+      >
+        <i class="bi" [ngClass]="item.icon"></i>
+        <span>{{ item.label }}</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <a routerLink="/" target="_blank" class="nav-item">
+        <i class="bi bi-box-arrow-up-right"></i>
+        <span>View Platform</span>
+      </a>
+
+      <div class="user-card">
+        <i class="bi bi-shield-lock-fill"></i>
+        <div>
+          <div class="user-name">
+            {{ user()?.fullName || 'Admin' }}
+          </div>
+          <div class="user-role">SUPER ADMIN</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <div class="admin-main">
+    <header class="admin-topbar">
+      <div>
+        <h1 class="topbar-title">Platform Dashboard</h1>
+        <p class="topbar-sub">Manage all stores and platform settings</p>
+      </div>
+
+      <div class="topbar-right">
+        <button type="button" class="icon-btn" title="Notifications">
+          <i class="bi bi-bell"></i>
+        </button>
+
+        <div class="user-menu">
+          <button type="button" class="user-btn" (click)="toggleUserMenu()">
+            <i class="bi bi-person-circle"></i>
+            <span class="d-none d-md-inline ms-1">
+              {{ user()?.fullName?.split(' ')?.[0] || 'Admin' }}
+            </span>
+            <i class="bi bi-chevron-down ms-1 small"></i>
+          </button>
+
+          <div class="user-dropdown" *ngIf="userMenuOpen()">
+            <div class="dropdown-header">
+              <div class="dropdown-name">{{ user()?.fullName }}</div>
+              <div class="dropdown-email">{{ user()?.email }}</div>
+            </div>
+            <div class="dropdown-divider"></div>
+            <button
+              type="button"
+              class="dropdown-item danger"
+              (click)="logout()"
+            >
+              <i class="bi bi-box-arrow-right"></i> Logout
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="admin-content">
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+</div>

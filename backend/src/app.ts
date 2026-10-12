@@ -15,6 +15,7 @@ import subscriptionsRoutes from './modules/subscriptions/subscriptions.routes';
 import cartsRoutes from './modules/carts/carts.routes';
 import ordersRoutes from './modules/orders/orders.routes';
 import customersRoutes from './modules/customers/customers.routes';
+import adminRoutes from './modules/admin/admin.routes';
 
 const app = express();
 
@@ -30,10 +31,10 @@ app.use(express.json({ limit: '1mb' }));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-// Static uploads folder
+// Static uploads
 app.use('/uploads', express.static(path.resolve(__dirname, '../uploads')));
 
-// Health check
+// Health
 app.get('/api/health', (req, res) => {
   res.json({
     success: true,
@@ -54,8 +55,9 @@ app.use('/api/subscriptions', subscriptionsRoutes);
 app.use('/api/cart', cartsRoutes);
 app.use('/api/orders', ordersRoutes);
 app.use('/api/customers', customersRoutes);
+app.use('/api/admin', adminRoutes);
 
-// 404 + error handlers (must be last)
+// 404 + error handlers
 app.use(notFoundHandler);
 app.use(errorHandler);
 

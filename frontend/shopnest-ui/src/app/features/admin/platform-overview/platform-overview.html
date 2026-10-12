@@ -1,0 +1,212 @@
+<div class="page">
+  <!-- Loading -->
+  <div *ngIf="loading()" class="loading-block">
+    <div class="spinner-border text-primary"></div>
+    <p class="mt-3 text-muted">Loading platform stats...</p>
+  </div>
+
+  <!-- Content -->
+  <ng-container *ngIf="!loading() && stats() as s">
+    <!-- Header -->
+    <div class="welcome-row">
+      <div>
+        <h2 class="welcome-title">Platform Overview</h2>
+        <p class="welcome-sub">
+          Real-time metrics across all stores on ShopNest
+        </p>
+      </div>
+    </div>
+
+    <!-- Stats grid -->
+    <div class="stats-grid">
+      <!-- Stores -->
+      <div class="stat-card">
+        <div class="stat-icon bg-purple">
+          <i class="bi bi-shop"></i>
+        </div>
+        <div class="stat-body">
+          <div class="stat-label">Total Stores</div>
+          <div class="stat-value">{{ s.stores.total }}</div>
+          <div class="stat-meta">
+            <span class="badge-soft success">
+              {{ s.stores.active }} active
+            </span>
+            <span class="badge-soft danger" *ngIf="s.stores.suspended > 0">
+              {{ s.stores.suspended }} suspended
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- MRR -->
+      <div class="stat-card">
+        <div class="stat-icon bg-green">
+          <i class="bi bi-currency-rupee"></i>
+        </div>
+        <div class="stat-body">
+          <div class="stat-label">Monthly Recurring Revenue</div>
+          <div class="stat-value">{{ s.revenue.mrr_inr | inr }}</div>
+          <div class="stat-meta">
+            <span class="text-muted small">
+              From {{ s.subscriptions.total_active }} active subs
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Orders -->
+      <div class="stat-card">
+        <div class="stat-icon bg-blue">
+          <i class="bi bi-receipt"></i>
+        </div>
+        <div class="stat-body">
+          <div class="stat-label">Total Orders</div>
+          <div class="stat-value">{{ s.revenue.total_orders }}</div>
+          <div class="stat-meta">
+            <span class="text-muted small">
+              Volume: {{ s.revenue.total_order_volume_inr | inr }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Users -->
+      <div class="stat-card">
+        <div class="stat-icon bg-orange">
+          <i class="bi bi-people"></i>
+        </div>
+        <div class="stat-body">
+          <div class="stat-label">Total Users</div>
+          <div class="stat-value">{{ s.users.total }}</div>
+          <div class="stat-meta">
+            <span class="text-muted small">
+              {{ s.users.owners }} owners · {{ s.users.customers }} customers
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Two column -->
+    <div class="content-grid">
+      <!-- Recent Orders -->
+      <div class="panel">
+        <div class="panel-head">
+          <h3 class="panel-title">
+            <i class="bi bi-clock-history"></i> Recent Orders
+          </h3>
+        </div>
+
+        <div *ngIf="recentOrders().length === 0" class="empty-mini">
+          <i class="bi bi-inbox"></i>
+          <p>No orders yet</p>
+        </div>
+
+        <div *ngIf="recentOrders().length > 0" class="orders-list">
+          <div *ngFor="let order of recentOrders()" class="order-row">
+            <div class="order-info">
+              <div class="order-num">{{ order.order_number }}</div>
+              <div class="order-store">
+                <i class="bi bi-shop"></i> {{ order.store_name }}
+              </div>
+            </div>
+            <div class="order-right">
+              <span class="order-amount">{{ order.total_inr | inr }}</span>
+              <span
+                class="order-status"
+                [ngClass]="getStatusClass(order.status)"
+              >
+                {{ order.status }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Plan Distribution -->
+      <div class="panel">
+        <div class="panel-head">
+          <h3 class="panel-title">
+            <i class="bi bi-pie-chart"></i> Plan Distribution
+          </h3>
+        </div>
+
+        <div class="plan-chart">
+          <div class="plan-row">
+            <div class="plan-info">
+              <span class="plan-dot bg-gray"></span>
+              <span class="plan-name">STARTER</span>
+            </div>
+            <div class="plan-bar-wrap">
+              <div
+                class="plan-bar bg-gray"
+                [style.width.%]="getPlanPercent(s.subscriptions.starter)"
+              ></div>
+            </div>
+            <span class="plan-count">{{ s.subscriptions.starter }}</span>
+          </div>
+
+          <div class="plan-row">
+            <div class="plan-info">
+              <span class="plan-dot bg-blue"></span>
+              <span class="plan-name">GROWTH</span>
+            </div>
+            <div class="plan-bar-wrap">
+              <div
+                class="plan-bar bg-blue"
+                [style.width.%]="getPlanPercent(s.subscriptions.growth)"
+              ></div>
+            </div>
+            <span class="plan-count">{{ s.subscriptions.growth }}</span>
+          </div>
+
+          <div class="plan-row">
+            <div class="plan-info">
+              <span class="plan-dot bg-purple"></span>
+              <span class="plan-name">PRO</span>
+            </div>
+            <div class="plan-bar-wrap">
+              <div
+                class="plan-bar bg-purple"
+                [style.width.%]="getPlanPercent(s.subscriptions.pro)"
+              ></div>
+            </div>
+            <span class="plan-count">{{ s.subscriptions.pro }}</span>
+          </div>
+        </div>
+
+        <div class="plan-total">
+          <span class="label">Total Active Subscriptions</span>
+          <strong>{{ getTotalPlanCount() }}</strong>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="actions-grid">
+      <a routerLink="/admin/stores" class="action-card">
+        <div class="action-icon bg-purple">
+          <i class="bi bi-shop"></i>
+        </div>
+        <div>
+          <div class="action-title">Manage Stores</div>
+          <div class="action-sub">
+            {{ s.stores.total }} stores on platform
+          </div>
+        </div>
+        <i class="bi bi-arrow-right action-arrow"></i>
+      </a>
+
+      <a routerLink="/admin/plans" class="action-card">
+        <div class="action-icon bg-blue">
+          <i class="bi bi-credit-card"></i>
+        </div>
+        <div>
+          <div class="action-title">Manage Plans</div>
+          <div class="action-sub">Configure pricing and features</div>
+        </div>
+        <i class="bi bi-arrow-right action-arrow"></i>
+      </a>
+    </div>
+  </ng-container>
+</div>

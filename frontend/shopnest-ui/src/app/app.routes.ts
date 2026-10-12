@@ -165,5 +165,40 @@ export const routes: Routes = [
     ],
   },
 
+  // MASTER ADMIN
+  {
+    path: 'admin',
+    loadComponent: () =>
+      import('./features/admin/admin-layout/admin-layout').then(
+        (m) => m.AdminLayoutComponent
+      ),
+    children: [
+      {
+        path: '',
+        loadComponent: () =>
+          import('./features/admin/platform-overview/platform-overview').then(
+            (m) => m.PlatformOverviewComponent
+          ),
+        title: 'Admin - ShopNest',
+      },
+      {
+        path: 'stores',
+        loadComponent: () =>
+          import('./features/admin/stores-manage/stores-manage').then(
+            (m) => m.StoresManage
+          ),
+        title: 'Stores - ShopNest',
+      },
+      {
+        path: 'plans',
+        loadComponent: () =>
+          import('./features/admin/plans-manage/plans-manage').then(
+            (m) => m.PlansManage
+          ),
+        title: 'Plans - ShopNest',
+      },
+    ],
+  },
+
   { path: '**', redirectTo: '' },
 ];
