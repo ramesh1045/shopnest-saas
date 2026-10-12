@@ -1,0 +1,125 @@
+<div class="page">
+  <!-- Header -->
+  <div class="page-header">
+    <div>
+      <h2 class="page-title">Profile</h2>
+      <p class="page-sub">Manage your personal information</p>
+    </div>
+    <button
+      type="button"
+      class="btn btn-ghost"
+      (click)="toggleEdit()"
+      *ngIf="!loading()"
+    >
+      <i class="bi" [ngClass]="editing() ? 'bi-x-lg' : 'bi-pencil'"></i>
+      {{ editing() ? 'Cancel' : 'Edit' }}
+    </button>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading()" class="loading-block">
+    <div class="spinner-border text-primary"></div>
+  </div>
+
+  <!-- Content -->
+  <div *ngIf="!loading()" class="profile-card">
+    <form [formGroup]="form" (ngSubmit)="save()" novalidate>
+      <!-- Full Name -->
+      <div class="field">
+        <label class="form-label" for="fullName">
+          <i class="bi bi-person"></i> Full Name
+        </label>
+        <input
+          id="fullName"
+          type="text"
+          class="form-control"
+          [class.is-invalid]="fullName.invalid && fullName.touched"
+          formControlName="fullName"
+          placeholder="Your full name"
+          [readonly]="!editing()"
+        />
+        <div
+          class="invalid-feedback"
+          *ngIf="fullName.invalid && fullName.touched"
+        >
+          <span *ngIf="fullName.errors?.['required']">Name is required</span>
+          <span *ngIf="fullName.errors?.['minlength']">
+            Minimum 2 characters
+          </span>
+        </div>
+      </div>
+
+      <!-- Email (read-only) -->
+      <div class="field">
+        <label class="form-label" for="email">
+          <i class="bi bi-envelope"></i> Email Address
+        </label>
+        <input
+          id="email"
+          type="email"
+          class="form-control readonly"
+          formControlName="email"
+          readonly
+        />
+        <div class="field-hint">
+          <i class="bi bi-info-circle"></i>
+          Email cannot be changed. Contact support if needed.
+        </div>
+      </div>
+
+      <!-- Phone -->
+      <div class="field">
+        <label class="form-label" for="phone">
+          <i class="bi bi-telephone"></i> Phone Number
+        </label>
+        <input
+          id="phone"
+          type="tel"
+          class="form-control"
+          formControlName="phone"
+          placeholder="+91 98765 43210"
+          [readonly]="!editing()"
+        />
+        <div class="field-hint">
+          Used for order updates and delivery.
+        </div>
+      </div>
+
+      <!-- Save button -->
+      <div *ngIf="editing()" class="form-actions">
+        <button
+          type="submit"
+          class="btn btn-primary"
+          [disabled]="saving() || form.invalid"
+        >
+          <span
+            *ngIf="saving()"
+            class="spinner-border spinner-border-sm me-2"
+          ></span>
+          {{ saving() ? 'Saving...' : 'Save Changes' }}
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Security section -->
+  <div *ngIf="!loading()" class="security-card">
+    <div class="security-header">
+      <i class="bi bi-shield-lock"></i>
+      <div>
+        <h3 class="security-title">Security</h3>
+        <p class="security-sub">Manage your account security</p>
+      </div>
+    </div>
+    <div class="security-row">
+      <div class="security-info">
+        <div class="security-label">Password</div>
+        <div class="security-desc">Last changed never</div>
+      </div>
+      <button type="button" class="btn btn-ghost" disabled>
+        <i class="bi bi-key"></i> Change Password
+        <span class="soon-tag">Soon</span>
+      </button>
+    </div>
+  </div>
+</div>

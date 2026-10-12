@@ -1,0 +1,284 @@
+:host {
+  display: block;
+}
+
+.account-shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: #f9fafb;
+}
+
+/* Topbar */
+.account-topbar {
+  background: #fff;
+  border-bottom: 1px solid #e5e7eb;
+  position: sticky;
+  top: 0;
+  z-index: 30;
+}
+
+.topbar-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  text-decoration: none;
+}
+
+.brand-mark {
+  width: 34px;
+  height: 34px;
+  background: var(--sn-primary, #ff6b00);
+  color: #fff;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: -0.02em;
+}
+
+.brand-text {
+  font-size: 17px;
+  font-weight: 700;
+  color: #111827;
+  letter-spacing: -0.02em;
+}
+
+.topbar-actions {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.topbar-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.5rem 0.75rem;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  color: #4b5563;
+  font-size: 13.5px;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.topbar-link:hover {
+  background: #f3f4f6;
+  color: var(--sn-primary, #ff6b00);
+}
+
+.topbar-link i {
+  font-size: 15px;
+}
+
+/* Main */
+.account-main {
+  flex: 1;
+  padding: 2rem 0 3rem;
+}
+
+/* Header */
+.account-header {
+  margin-bottom: 2rem;
+}
+
+.header-user {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.user-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #ff6b00, #ff9147);
+  color: #fff;
+  font-size: 22px;
+  font-weight: 700;
+  display: grid;
+  place-items: center;
+  letter-spacing: -0.02em;
+  flex-shrink: 0;
+}
+
+.user-name {
+  font-size: 24px;
+  font-weight: 700;
+  color: #111827;
+  letter-spacing: -0.02em;
+  margin: 0 0 0.25rem 0;
+}
+
+.user-email {
+  font-size: 14px;
+  color: #6b7280;
+  margin: 0;
+}
+
+/* Grid */
+.account-grid {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 1.5rem;
+  align-items: flex-start;
+}
+
+/* Sidebar */
+.account-sidebar {
+  position: sticky;
+  top: 80px;
+}
+
+.sidebar-nav {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.side-link {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 0.875rem;
+  color: #4b5563;
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  border-radius: 8px;
+  transition: all 0.15s;
+  position: relative;
+}
+
+.side-link:hover {
+  background: #f9fafb;
+  color: #111827;
+}
+
+.side-link.active {
+  background: #fff7ed;
+  color: var(--sn-primary, #ff6b00);
+}
+
+.side-link i:first-child {
+  font-size: 16px;
+  width: 20px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.side-arrow {
+  margin-left: auto;
+  font-size: 12px !important;
+  color: #9ca3af;
+  opacity: 0;
+  transition: opacity 0.15s;
+  width: auto !important;
+}
+
+.side-link:hover .side-arrow,
+.side-link.active .side-arrow {
+  opacity: 1;
+}
+
+/* Help block */
+.sidebar-help {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 1rem;
+  padding: 1rem;
+  background: linear-gradient(135deg, #1a1a1a, #2c2c2c);
+  border-radius: 12px;
+  color: #fff;
+}
+
+.sidebar-help i {
+  font-size: 22px;
+  color: var(--sn-primary, #ff6b00);
+  flex-shrink: 0;
+}
+
+.help-title {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.help-sub {
+  font-size: 11.5px;
+  color: #9ca3af;
+  margin-top: 0.125rem;
+}
+
+/* Content */
+.account-content {
+  min-width: 0;
+}
+
+/* Footer */
+.account-footer {
+  background: #fff;
+  border-top: 1px solid #e5e7eb;
+  padding: 1rem 0;
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.account-footer a {
+  color: var(--sn-primary, #ff6b00);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.account-footer a:hover {
+  text-decoration: underline;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .account-grid {
+    grid-template-columns: 1fr;
+  }
+  .account-sidebar {
+    position: static;
+  }
+  .sidebar-nav {
+    flex-direction: row;
+    overflow-x: auto;
+  }
+  .side-link {
+    white-space: nowrap;
+  }
+  .side-arrow {
+    display: none;
+  }
+  .sidebar-help {
+    display: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .user-avatar {
+    width: 52px;
+    height: 52px;
+    font-size: 18px;
+  }
+  .user-name {
+    font-size: 20px;
+  }
+}

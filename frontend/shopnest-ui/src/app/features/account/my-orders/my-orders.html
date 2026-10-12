@@ -1,0 +1,114 @@
+<div class="page">
+  <!-- Header -->
+  <div class="page-header">
+    <div>
+      <h2 class="page-title">My Orders</h2>
+      <p class="page-sub">
+        {{ orders().length }}
+        {{ orders().length === 1 ? 'order' : 'orders' }} total
+      </p>
+    </div>
+  </div>
+
+  <!-- Filter tabs -->
+  <div class="filter-tabs" *ngIf="!loading() && orders().length > 0">
+    <button
+      type="button"
+      class="filter-tab"
+      [class.active]="filter() === 'all'"
+      (click)="filter.set('all')"
+    >
+      All
+      <span class="tab-count">{{ orders().length }}</span>
+    </button>
+    <button
+      *ngFor="let s of statuses"
+      type="button"
+      class="filter-tab"
+      [class.active]="filter() === s"
+      (click)="filter.set(s)"
+      [style.display]="getStatusCount(s) === 0 ? 'none' : 'inline-flex'"
+    >
+      {{ s }}
+      <span class="tab-count">{{ getStatusCount(s) }}</span>
+    </button>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading()" class="loading-block">
+    <div class="spinner-border text-primary"></div>
+  </div>
+
+  <!-- Empty -->
+  <div *ngIf="!loading() && orders().length === 0" class="empty-block">
+    <i class="bi bi-receipt"></i>
+    <h3>No orders yet</h3>
+    <p>Your order history will appear here once you place an order.</p>
+    <a routerLink="/" class="btn btn-primary mt-3">
+      <i class="bi bi-shop me-1"></i> Start Shopping
+    </a>
+  </div>
+
+  <!-- Filtered empty -->
+  <div
+    *ngIf="!loading() && orders().length > 0 && getFilteredOrders().length === 0"
+    class="empty-block small"
+  >
+    <i class="bi bi-funnel"></i>
+    <h3>No {{ filter().toLowerCase() }} orders</h3>
+    <p>Try a different filter.</p>
+  </div>
+
+  <!-- Orders list -->
+  <div *ngIf="!loading() && getFilteredOrders().length > 0" class="orders-list">
+    <a
+      *ngFor="let order of getFilteredOrders()"
+      [routerLink]="['/account/orders', order.id]"
+      class="order-card"
+    >
+      <!-- Top row -->
+      <div class="order-top">
+        <div class="order-id-block">
+          <div class="order-number">{{ order.order_number }}</div>
+          <div class="order-date">
+            {{ order.created_at | date: 'medium' }}
+          </div>
+        </div>
+        <span
+          class="status-badge"
+          [ngClass]="getStatusClass(order.status)"
+        >
+          <i class="bi" [ngClass]="getStatusIcon(order.status)"></i>
+          {{ order.status }}
+        </span>
+      </div>
+
+      <!-- Store + summary -->
+      <div class="order-mid">
+        <div class="order-cell">
+          <span class="cell-label">Store</span>
+          <span class="cell-value">{{ order.store_name }}</span>
+        </div>
+        <div class="order-cell">
+          <span class="cell-label">Payment</span>
+          <span class="cell-value">
+            {{ order.payment_method === 'COD' ? 'Cash on Delivery' : order.payment_method }}
+          </span>
+        </div>
+        <div class="order-cell">
+          <span class="cell-label">Total</span>
+          <span class="cell-value total-value">
+            {{ order.total_inr | inr }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Bottom: link -->
+      <div class="order-bottom">
+        <span class="view-details">
+          View details <i class="bi bi-arrow-right"></i>
+        </span>
+      </div>
+    </a>
+  </div>
+</div>

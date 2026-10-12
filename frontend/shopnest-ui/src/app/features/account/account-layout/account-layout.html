@@ -1,0 +1,79 @@
+<div class="account-shell">
+  <!-- Simple top bar -->
+  <header class="account-topbar">
+    <div class="container topbar-inner">
+      <a routerLink="/" class="brand">
+        <span class="brand-mark">SN</span>
+        <span class="brand-text">ShopNest</span>
+      </a>
+
+      <div class="topbar-actions">
+        <a routerLink="/" class="topbar-link">
+          <i class="bi bi-shop"></i>
+          <span class="d-none d-md-inline">Shop</span>
+        </a>
+        <button type="button" class="topbar-link" (click)="logout()">
+          <i class="bi bi-box-arrow-right"></i>
+          <span class="d-none d-md-inline">Logout</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main content -->
+  <main class="account-main">
+    <div class="container">
+      <!-- Header -->
+      <div class="account-header">
+        <div class="header-user">
+          <div class="user-avatar">{{ getInitials() }}</div>
+          <div>
+            <h1 class="user-name">{{ user()?.fullName || 'My Account' }}</h1>
+            <p class="user-email">{{ user()?.email }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Layout -->
+      <div class="account-grid">
+        <!-- Sidebar -->
+        <aside class="account-sidebar">
+          <nav class="sidebar-nav">
+            <a
+              *ngFor="let item of navItems"
+              [routerLink]="item.path"
+              routerLinkActive="active"
+              class="side-link"
+            >
+              <i class="bi" [ngClass]="item.icon"></i>
+              <span>{{ item.label }}</span>
+              <i class="bi bi-chevron-right side-arrow"></i>
+            </a>
+          </nav>
+
+          <div class="sidebar-help">
+            <i class="bi bi-headset"></i>
+            <div>
+              <div class="help-title">Need help?</div>
+              <div class="help-sub">Contact our support team</div>
+            </div>
+          </div>
+        </aside>
+
+        <!-- Content -->
+        <div class="account-content">
+          <router-outlet></router-outlet>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="account-footer">
+    <div class="container text-center">
+      <p class="mb-0">
+        © 2026 ShopNest · <a routerLink="/">Back to ShopNest</a>
+      </p>
+    </div>
+  </footer>
+</div>

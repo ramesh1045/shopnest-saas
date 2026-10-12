@@ -1,0 +1,184 @@
+<div class="page">
+  <!-- Back link -->
+  <a routerLink="/account/orders" class="back-link">
+    <i class="bi bi-arrow-left"></i> Back to My Orders
+  </a>
+
+  <!-- Loading -->
+  <div *ngIf="loading()" class="loading-block">
+    <div class="spinner-border text-primary"></div>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="!loading() && error()" class="error-block">
+    <i class="bi bi-exclamation-circle"></i>
+    <h3>{{ error() }}</h3>
+    <a routerLink="/account/orders" class="btn btn-primary mt-3">
+      Back to Orders
+    </a>
+  </div>
+
+  <!-- Content -->
+  <ng-container *ngIf="!loading() && !error() && order()">
+    <!-- Header card -->
+    <div class="header-card">
+      <div class="header-top">
+        <div>
+          <h2 class="order-num">{{ order()!.order_number }}</h2>
+          <p class="order-date">
+            Placed on {{ order()!.created_at | date: 'medium' }}
+          </p>
+        </div>
+        <span
+          class="status-badge"
+          [ngClass]="getStatusClass(order()!.status)"
+        >
+          <i class="bi" [ngClass]="getStatusIcon(order()!.status)"></i>
+          {{ order()!.status }}
+        </span>
+      </div>
+
+      <!-- Status message -->
+      <div class="status-message">
+        <i class="bi bi-info-circle"></i>
+        <span>{{ getStatusMessage() }}</span>
+      </div>
+
+      <!-- Timeline -->
+      <div class="timeline" *ngIf="order()!.status !== 'CANCELLED'">
+        <div
+          *ngFor="let step of flow"
+          class="timeline-step"
+          [class.completed]="isCompleted(step)"
+          [class.current]="isCurrent(step)"
+        >
+          <div class="step-dot">
+            <i
+              class="bi"
+              [ngClass]="isCompleted(step) ? 'bi-check-lg' : 'bi-circle'"
+            ></i>
+          </div>
+          <div class="step-label">{{ step }}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Two-column grid -->
+    <div class="detail-grid">
+      <!-- LEFT: Items -->
+      <div class="detail-main">
+        <section class="card">
+          <h3 class="card-title">
+            <i class="bi bi-bag"></i> Items Ordered
+          </h3>
+
+          <div class="items-list">
+            <div
+              *ngFor="let item of order()!.items"
+              class="order-item-row"
+            >
+              <div class="item-left">
+                <div class="item-thumb">
+                  <i class="bi bi-image"></i>
+                </div>
+                <div>
+                  <div class="item-name">{{ item.product_name }}</div>
+                  <div class="item-meta">
+                    {{ item.quantity }} × {{ item.unit_price_inr | inr }}
+                  </div>
+                </div>
+              </div>
+              <div class="item-total">
+                {{ item.line_total_inr | inr }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Totals -->
+          <div class="totals">
+            <div class="total-row">
+              <span>Subtotal</span>
+              <span>{{ order()!.subtotal_inr | inr }}</span>
+            </div>
+            <div class="total-row" *ngIf="order()!.discount_inr > 0">
+              <span>Discount</span>
+              <span class="text-success">
+                − {{ order()!.discount_inr | inr }}
+              </span>
+            </div>
+            <div class="total-row grand">
+              <span>Total</span>
+              <strong>{{ order()!.total_inr | inr }}</strong>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- RIGHT: Info -->
+      <aside class="detail-side">
+        <!-- Delivery -->
+        <section class="card">
+          <h3 class="card-title">
+            <i class="bi bi-geo-alt"></i> Delivery Address
+          </h3>
+          <div class="address-box">
+            <div class="addr-name">
+              {{ order()!.shipping_address.full_name }}
+            </div>
+            <div>{{ order()!.shipping_address.line1 }}</div>
+            <div *ngIf="order()!.shipping_address.line2">
+              {{ order()!.shipping_address.line2 }}
+            </div>
+            <div>
+              {{ order()!.shipping_address.city }},
+              {{ order()!.shipping_address.state }} —
+              {{ order()!.shipping_address.pincode }}
+            </div>
+            <div class="addr-phone">
+              <i class="bi bi-telephone"></i>
+              {{ order()!.shipping_address.phone }}
+            </div>
+          </div>
+        </section>
+
+        <!-- Payment -->
+        <section class="card">
+          <h3 class="card-title">
+            <i class="bi bi-credit-card"></i> Payment
+          </h3>
+          <div class="info-line">
+            <span class="info-label">Method</span>
+            <span class="info-value">
+              {{ order()!.payment_method === 'COD' ? 'Cash on Delivery' : order()!.payment_method }}
+            </span>
+          </div>
+          <div class="info-line">
+            <span class="info-label">Status</span>
+            <span
+              class="pay-status"
+              [class.paid]="order()!.payment_status === 'PAID'"
+              [class.pending]="order()!.payment_status === 'PENDING'"
+            >
+              {{ order()!.payment_status }}
+            </span>
+          </div>
+          <div class="info-line">
+            <span class="info-label">Total</span>
+            <span class="info-value bold">
+              {{ order()!.total_inr | inr }}
+            </span>
+          </div>
+        </section>
+
+        <!-- Help -->
+        <div class="help-note">
+          <i class="bi bi-headset"></i>
+          <div>
+            <strong>Need help with this order?</strong>
+            <div class="small">Contact store support for queries.</div>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </ng-container>
+</div>

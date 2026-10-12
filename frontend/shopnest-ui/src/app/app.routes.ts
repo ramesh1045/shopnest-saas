@@ -20,14 +20,13 @@ export const routes: Routes = [
     title: 'Create Account - ShopNest',
   },
 
-  // ============ STOREFRONT ============
+  // STOREFRONT
   {
     path: 'store/:slug',
     loadComponent: () =>
       import('./features/storefront/store-home/store-home').then(
         (m) => m.StoreHomeComponent
       ),
-    title: 'Store - ShopNest',
   },
   {
     path: 'store/:slug/products',
@@ -35,7 +34,6 @@ export const routes: Routes = [
       import('./features/storefront/product-list/product-list').then(
         (m) => m.ProductListComponent
       ),
-    title: 'Products - ShopNest',
   },
   {
     path: 'store/:slug/product/:id',
@@ -43,15 +41,11 @@ export const routes: Routes = [
       import('./features/storefront/product-detail/product-detail').then(
         (m) => m.ProductDetailComponent
       ),
-    title: 'Product - ShopNest',
   },
   {
     path: 'store/:slug/cart',
     loadComponent: () =>
-      import('./features/storefront/cart/cart').then(
-        (m) => m.CartComponent
-      ),
-    title: 'Cart - ShopNest',
+      import('./features/storefront/cart/cart').then((m) => m.CartComponent),
   },
   {
     path: 'store/:slug/checkout',
@@ -59,7 +53,6 @@ export const routes: Routes = [
       import('./features/storefront/checkout/checkout').then(
         (m) => m.CheckoutComponent
       ),
-    title: 'Checkout - ShopNest',
   },
   {
     path: 'store/:slug/order/:id/confirm',
@@ -67,10 +60,9 @@ export const routes: Routes = [
       import('./features/storefront/order-confirm/order-confirm').then(
         (m) => m.OrderConfirmComponent
       ),
-    title: 'Order Confirmed - ShopNest',
   },
 
-  // ============ MERCHANT ============
+  // MERCHANT
   {
     path: 'merchant',
     loadComponent: () =>
@@ -84,14 +76,13 @@ export const routes: Routes = [
           import('./features/merchant/dashboard/dashboard').then(
             (m) => m.Dashboard
           ),
-        title: 'Dashboard - ShopNest',
-      },      {
+      },
+      {
         path: 'products',
         loadComponent: () =>
           import('./features/merchant/product-manage/product-manage').then(
             (m) => m.ProductManage
           ),
-        title: 'Products - ShopNest',
       },
       {
         path: 'products/new',
@@ -99,7 +90,6 @@ export const routes: Routes = [
           import('./features/merchant/product-form/product-form').then(
             (m) => m.ProductFormComponent
           ),
-        title: 'Add Product - ShopNest',
       },
       {
         path: 'products/:id/edit',
@@ -107,15 +97,6 @@ export const routes: Routes = [
           import('./features/merchant/product-form/product-form').then(
             (m) => m.ProductFormComponent
           ),
-        title: 'Edit Product - ShopNest',
-      },
-      {
-        path: 'products',
-        loadComponent: () =>
-          import('./features/merchant/product-manage/product-manage').then(
-            (m) => m.ProductManage
-          ),
-        title: 'Products - ShopNest',
       },
       {
         path: 'orders',
@@ -123,7 +104,6 @@ export const routes: Routes = [
           import('./features/merchant/order-manage/order-manage').then(
             (m) => m.OrderManage
           ),
-        title: 'Orders - ShopNest',
       },
       {
         path: 'orders/:id',
@@ -131,7 +111,6 @@ export const routes: Routes = [
           import('./features/merchant/order-detail/order-detail').then(
             (m) => m.OrderDetail
           ),
-        title: 'Order Details - ShopNest',
       },
       {
         path: 'customers',
@@ -139,7 +118,6 @@ export const routes: Routes = [
           import('./features/merchant/customer-manage/customer-manage').then(
             (m) => m.CustomerManage
           ),
-        title: 'Customers - ShopNest',
       },
       {
         path: 'settings',
@@ -147,13 +125,45 @@ export const routes: Routes = [
           import('./features/merchant/settings/settings').then(
             (m) => m.Settings
           ),
-        title: 'Settings - ShopNest',
       },
     ],
   },
 
+  // CUSTOMER ACCOUNT
   {
-    path: '**',
-    redirectTo: '',
+    path: 'account',
+    loadComponent: () =>
+      import('./features/account/account-layout/account-layout').then(
+        (m) => m.AccountLayoutComponent
+      ),
+    children: [
+      { path: '', redirectTo: 'profile', pathMatch: 'full' },
+      {
+        path: 'profile',
+        loadComponent: () =>
+          import('./features/account/profile/profile').then(
+            (m) => m.ProfileComponent
+          ),
+        title: 'Profile - ShopNest',
+      },
+      {
+        path: 'orders',
+        loadComponent: () =>
+          import('./features/account/my-orders/my-orders').then(
+            (m) => m.MyOrdersComponent
+          ),
+        title: 'My Orders - ShopNest',
+      },
+      {
+        path: 'orders/:id',
+        loadComponent: () =>
+          import('./features/account/order-detail/order-detail').then(
+            (m) => m.OrderDetailComponent
+          ),
+        title: 'Order Details - ShopNest',
+      },
+    ],
   },
+
+  { path: '**', redirectTo: '' },
 ];
